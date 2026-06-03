@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan Python untuk Pemula</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b27; --bg3: #1e2535;
+    --border: #2a3347; --text: #e2e8f0; --text2: #8b9ab5; --text3: #4a5568;
+    --accent: #4ade80; --accent2: #818cf8;
+    --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+    --pink: #f472b6; --orange: #fb923c; --blue: #38bdf8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',system-ui,sans-serif; line-height:1.75; letter-spacing:0.01em; -webkit-font-smoothing:antialiased; }
+
+  /* NAVBAR */
+  .navbar { position:sticky; top:0; z-index:50; background:rgba(15,17,23,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 40px; }
+  .navbar-inner { max-width:900px; margin:0 auto; height:56px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-btn { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; color:var(--text2); background:transparent; border:1px solid var(--border); border-radius:8px; padding:6px 13px; cursor:pointer; text-decoration:none; transition:all 0.2s; font-family:'Plus Jakarta Sans',sans-serif; }
+  .nav-btn:hover { color:var(--text); border-color:var(--text2); background:var(--bg2); }
+  .nav-btn svg { flex-shrink:0; }
+  .navbar-title { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:7px; }
+  .navbar-title::before { content:''; width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 7px var(--accent); }
+
+  /* DRAWER */
+  .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+  .drawer-overlay.open { opacity:1; pointer-events:all; }
+  .drawer { position:fixed; top:0; left:0; bottom:0; width:300px; background:var(--bg2); border-right:1px solid var(--border); z-index:91; transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow:hidden; }
+  .drawer.open { transform:translateX(0); }
+  .drawer-header { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .drawer-header h3 { font-size:14px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .drawer-header h3 svg { color:var(--accent); }
+  .drawer-close { width:30px; height:30px; border-radius:7px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .drawer-close:hover { color:var(--text); border-color:var(--text2); }
+  .drawer-list { overflow-y:auto; flex:1; padding:10px 12px 20px; }
+  .drawer-list::-webkit-scrollbar { width:4px; }
+  .drawer-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+  .drawer-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; text-decoration:none; color:var(--text2); font-size:13px; transition:all 0.15s; cursor:pointer; }
+  .drawer-item:hover { background:var(--bg3); color:var(--text); }
+  .drawer-num { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); width:20px; flex-shrink:0; text-align:right; }
+
+  /* HERO */
+  .hero { padding:64px 40px 56px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--border); }
+  .hero-badge { display:inline-block; background:rgba(74,222,128,0.1); color:var(--accent); border:1px solid rgba(74,222,128,0.25); padding:4px 14px; border-radius:99px; font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+  .hero h1 { font-size:clamp(32px,5vw,52px); font-weight:800; line-height:1.15; margin-bottom:16px; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { color:var(--text2); font-size:16px; max-width:560px; }
+
+  /* CONTENT */
+  .content { max-width:900px; margin:0 auto; padding:0 40px 80px; }
+
+  /* SECTION */
+  .section { margin-top:64px; opacity:0; transform:translateY(20px); animation:fadeUp 0.5s forwards; }
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .section-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+  .section-num { background:var(--accent); color:#0f1117; font-weight:700; font-size:12px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section h2 { font-size:22px; font-weight:700; color:var(--text); }
+  .section > p, .desc { color:var(--text2); font-size:15px; margin-bottom:20px; line-height:1.8; }
+
+  /* CODE */
+  .code-block { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:16px 0; }
+  .code-header { background:var(--bg3); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .code-dots { display:flex; gap:6px; }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .dot-r { background:#f87171; } .dot-y { background:#fbbf24; } .dot-g { background:#4ade80; }
+  .code-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+  pre { padding:20px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.8; }
+
+  /* SYNTAX - Python theme */
+  .kw  { color:var(--accent2); }   /* keywords: def, if, for, import */
+  .fn  { color:var(--blue); }      /* functions: print, input, len */
+  .str { color:var(--green); }     /* strings */
+  .num { color:var(--orange); }    /* numbers */
+  .cmt { color:var(--text3); font-style:italic; }
+  .inc { color:var(--pink); }      /* import */
+  .fmt { color:var(--yellow); }    /* f-string vars */
+  .op  { color:var(--red); }
+  .punc { color:var(--text2); }
+  .cls { color:var(--yellow); }    /* class names */
+  .dec { color:var(--pink); }      /* decorators */
+
+  /* ANNOTATIONS */
+  .annotations { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .ann { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:10px 14px; font-size:13.5px; display:flex; gap:12px; align-items:flex-start; }
+  .ann.green { border-left-color:var(--green); }
+  .ann.yellow { border-left-color:var(--yellow); }
+  .ann.pink { border-left-color:var(--pink); }
+  .ann.orange { border-left-color:var(--orange); }
+  .ann.purple { border-left-color:var(--accent2); }
+  .ann.blue { border-left-color:var(--blue); }
+  .ann-code { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--bg3); padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; color:var(--accent); }
+  .ann.green .ann-code { color:var(--green); }
+  .ann.yellow .ann-code { color:var(--yellow); }
+  .ann.pink .ann-code { color:var(--pink); }
+  .ann.orange .ann-code { color:var(--orange); }
+  .ann.purple .ann-code { color:var(--accent2); }
+  .ann.blue .ann-code { color:var(--blue); }
+  .ann-desc { color:var(--text2); font-size:13.5px; }
+
+  /* OUTPUT */
+  .output-label { display:flex; align-items:center; gap:8px; margin-top:20px; margin-bottom:8px; font-size:12px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+  .output-label::before { content:''; display:block; width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+  .output-box { background:#0a0e16; border:1px solid var(--border); border-radius:10px; padding:16px 20px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--green); line-height:1.9; white-space:pre; }
+  .output-input { color:var(--yellow); }
+  .output-dim { color:var(--text3); }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; margin:16px 0; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { background:var(--bg3); color:var(--accent); padding:10px 16px; text-align:left; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+  td { padding:10px 16px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+  td:first-child { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--yellow); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--bg2); }
+
+  /* CALLOUT */
+  .callout { background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px 18px; font-size:14px; color:var(--text2); margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+  .callout-icon { flex-shrink:0; margin-top:2px; color:var(--accent); }
+  .callout.warn { background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.2); }
+  .callout.warn .callout-icon { color:var(--yellow); }
+
+  /* DIVIDER */
+  .divider { border:none; border-top:1px solid var(--border); margin:48px 0 0; }
+
+  /* INLINE CODE */
+  code { font-family:'JetBrains Mono',monospace; font-size:12.5px; background:var(--bg3); padding:2px 6px; border-radius:4px; color:var(--accent); }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--border); padding:32px 40px; max-width:900px; margin:0 auto; text-align:center; color:var(--text3); font-size:13px; }
+
+  @media (max-width:600px) {
+    .hero, .content { padding-left:20px; padding-right:20px; }
+    .navbar { padding-left:20px; padding-right:20px; }
+    .drawer { width:280px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="tutupDrawer()"></div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </h3>
+    <button class="drawer-close" onclick="tutupDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-list">
+    <a class="drawer-item" href="#pengenalan" onclick="tutupDrawer()"><span class="drawer-num">01</span> Pengenalan Python</a>
+    <a class="drawer-item" href="#tipe-data" onclick="tutupDrawer()"><span class="drawer-num">02</span> Tipe Data</a>
+    <a class="drawer-item" href="#io" onclick="tutupDrawer()"><span class="drawer-num">03</span> print &amp; input</a>
+    <a class="drawer-item" href="#operator" onclick="tutupDrawer()"><span class="drawer-num">04</span> Operator</a>
+    <a class="drawer-item" href="#string" onclick="tutupDrawer()"><span class="drawer-num">05</span> String</a>
+    <a class="drawer-item" href="#ifelse" onclick="tutupDrawer()"><span class="drawer-num">06</span> if / elif / else</a>
+    <a class="drawer-item" href="#loop" onclick="tutupDrawer()"><span class="drawer-num">07</span> Loop</a>
+    <a class="drawer-item" href="#list" onclick="tutupDrawer()"><span class="drawer-num">08</span> List</a>
+    <a class="drawer-item" href="#tuple" onclick="tutupDrawer()"><span class="drawer-num">09</span> Tuple</a>
+    <a class="drawer-item" href="#dictionary" onclick="tutupDrawer()"><span class="drawer-num">10</span> Dictionary</a>
+    <a class="drawer-item" href="#set" onclick="tutupDrawer()"><span class="drawer-num">11</span> Set</a>
+    <a class="drawer-item" href="#fungsi" onclick="tutupDrawer()"><span class="drawer-num">12</span> Fungsi</a>
+    <a class="drawer-item" href="#lambda" onclick="tutupDrawer()"><span class="drawer-num">13</span> Lambda</a>
+    <a class="drawer-item" href="#scope" onclick="tutupDrawer()"><span class="drawer-num">14</span> Scope Variabel</a>
+    <a class="drawer-item" href="#module" onclick="tutupDrawer()"><span class="drawer-num">15</span> import &amp; Module</a>
+    <a class="drawer-item" href="#file" onclick="tutupDrawer()"><span class="drawer-num">16</span> File I/O</a>
+    <a class="drawer-item" href="#error" onclick="tutupDrawer()"><span class="drawer-num">17</span> Error Handling</a>
+    <a class="drawer-item" href="#listcomp" onclick="tutupDrawer()"><span class="drawer-num">18</span> List Comprehension</a>
+    <a class="drawer-item" href="#oop" onclick="tutupDrawer()"><span class="drawer-num">19</span> OOP - Class &amp; Object</a>
+    <a class="drawer-item" href="#inheritance" onclick="tutupDrawer()"><span class="drawer-num">20</span> Inheritance</a>
+    <a class="drawer-item" href="#iterator" onclick="tutupDrawer()"><span class="drawer-num">21</span> Iterator &amp; Generator</a>
+    <a class="drawer-item" href="#decorator" onclick="tutupDrawer()"><span class="drawer-num">22</span> Decorator</a>
+    <a class="drawer-item" href="#regex" onclick="tutupDrawer()"><span class="drawer-num">23</span> Regex</a>
+    <a class="drawer-item" href="#venv" onclick="tutupDrawer()"><span class="drawer-num">24</span> Virtual Environment &amp; pip</a>
+    <a class="drawer-item" href="#tips" onclick="tutupDrawer()"><span class="drawer-num">25</span> Tips &amp; Trik Python</a>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="nav-btn" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Kembali
+    </a>
+    <div class="navbar-title">Python</div>
+    <button class="nav-btn" onclick="bukaDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Panduan Pemula</div>
+  <h1>Belajar<br><span>Python</span><br>dari Nol</h1>
+  <p>Panduan lengkap Python — dari dasar sampai OOP, semua dijelaskan dengan santai, ada kode, anotasi, dan preview outputnya.</p>
+</div>
+
+<div class="content">
+
+<!-- 1. PENGENALAN -->
+<div class="section" id="pengenalan" style="animation-delay:0.05s">
+  <div class="section-header"><div class="section-num">1</div><h2>Pengenalan Python</h2></div>
+  <p class="desc">Python adalah bahasa pemrograman yang simpel, mudah dibaca, dan serbaguna. Tidak perlu titik koma, tidak perlu deklarasi tipe data — Python langsung paham maksudmu. Cocok banget buat pemula.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">hello.py</span></div>
+    <pre><span class="cmt"># Program Python pertamamu</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"Halo, dunia!"</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"Selamat belajar Python!"</span><span class="punc">)</span>
+
+<span class="cmt"># Python tidak butuh titik koma atau kurung kurawal</span>
+<span class="cmt"># Indentasi (spasi) yang menentukan blok kode</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann green"><span class="ann-code"># komentar</span><span class="ann-desc">Komentar di Python pakai tanda <code>#</code>. Sama fungsinya dengan <code>// komentar</code> di C — tidak dieksekusi, hanya catatan.</span></div>
+    <div class="ann"><span class="ann-code">print()</span><span class="ann-desc">Fungsi bawaan Python untuk menampilkan output. Tidak perlu <code>#include</code> apapun — langsung pakai saja.</span></div>
+    <div class="ann yellow"><span class="ann-code">Indentasi</span><span class="ann-desc">Di Python, spasi/tab di awal baris menentukan blok kode (menggantikan kurung kurawal di C). Wajib konsisten — campur spasi dan tab akan error.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Halo, dunia!
+Selamat belajar Python!</div>
+</div>
+
+<hr class="divider">
+
+<!-- 2. TIPE DATA -->
+<div class="section" id="tipe-data" style="animation-delay:0.1s">
+  <div class="section-header"><div class="section-num">2</div><h2>Tipe Data</h2></div>
+  <p class="desc">Python menentukan tipe data secara otomatis — kamu tidak perlu tulis <code>int</code>, <code>float</code>, dll. di depan variabel. Cukup langsung isi nilainya.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Tipe</th><th>Nama</th><th>Contoh</th><th>Keterangan</th></tr></thead>
+    <tbody>
+      <tr><td>int</td><td>Integer</td><td><code>umur = 20</code></td><td>Angka bulat</td></tr>
+      <tr><td>float</td><td>Float</td><td><code>nilai = 87.5</code></td><td>Angka desimal</td></tr>
+      <tr><td>str</td><td>String</td><td><code>nama = "Budi"</code></td><td>Teks</td></tr>
+      <tr><td>bool</td><td>Boolean</td><td><code>lulus = True</code></td><td>True atau False</td></tr>
+      <tr><td>list</td><td>List</td><td><code>nilai = [80, 90, 75]</code></td><td>Kumpulan data, bisa diubah</td></tr>
+      <tr><td>tuple</td><td>Tuple</td><td><code>warna = ("merah", "biru")</code></td><td>Kumpulan data, tidak bisa diubah</td></tr>
+      <tr><td>dict</td><td>Dictionary</td><td><code>mhs = {"nama": "Budi"}</code></td><td>Pasangan kunci-nilai</td></tr>
+      <tr><td>None</td><td>NoneType</td><td><code>x = None</code></td><td>Tidak ada nilai (seperti NULL di C)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">tipe-data.py</span></div>
+    <pre>umur   <span class="op">=</span> <span class="num">20</span>
+nilai  <span class="op">=</span> <span class="num">87.5</span>
+nama   <span class="op">=</span> <span class="str">"Budi"</span>
+lulus  <span class="op">=</span> <span class="kw">True</span>
+
+<span class="fn">print</span><span class="punc">(</span><span class="fn">type</span><span class="punc">(</span>umur<span class="punc">))</span>    <span class="cmt"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">type</span><span class="punc">(</span>nilai<span class="punc">))</span>   <span class="cmt"># &lt;class 'float'&gt;</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">type</span><span class="punc">(</span>nama<span class="punc">))</span>    <span class="cmt"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">type</span><span class="punc">(</span>lulus<span class="punc">))</span>   <span class="cmt"># &lt;class 'bool'&gt;</span>
+
+<span class="cmt"># Konversi tipe data</span>
+x <span class="op">=</span> <span class="fn">int</span><span class="punc">(</span><span class="str">"42"</span><span class="punc">)</span>       <span class="cmt"># str  → int</span>
+y <span class="op">=</span> <span class="fn">float</span><span class="punc">(</span><span class="num">10</span><span class="punc">)</span>      <span class="cmt"># int  → float</span>
+z <span class="op">=</span> <span class="fn">str</span><span class="punc">(</span><span class="num">3.14</span><span class="punc">)</span>      <span class="cmt"># float → str</span>
+b <span class="op">=</span> <span class="fn">bool</span><span class="punc">(</span><span class="num">0</span><span class="punc">)</span>        <span class="cmt"># 0 → False, selain 0 → True</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">type()</span><span class="ann-desc">Fungsi bawaan untuk cek tipe data sebuah variabel. Berguna saat debugging.</span></div>
+    <div class="ann green"><span class="ann-code">int("42")</span><span class="ann-desc">Konversi tipe data — penting karena <code>input()</code> selalu menghasilkan string, jadi kalau mau angka harus di-convert dulu pakai <code>int()</code> atau <code>float()</code>.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+&lt;class 'bool'&gt;</div>
+</div>
+
+<hr class="divider">
+
+<!-- 3. PRINT & INPUT -->
+<div class="section" id="io" style="animation-delay:0.15s">
+  <div class="section-header"><div class="section-num">3</div><h2>print & input — "Tampilkan & Terima Input"</h2></div>
+  <p class="desc"><code>print()</code> untuk tampilkan output, <code>input()</code> untuk terima input dari user. Di Python ada fitur keren bernama <strong>f-string</strong> untuk menyisipkan variabel langsung ke dalam teks.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">io.py</span></div>
+    <pre><span class="cmt"># INPUT — selalu menghasilkan string!</span>
+nama  <span class="op">=</span> <span class="fn">input</span><span class="punc">(</span><span class="str">"Masukkan nama  : "</span><span class="punc">)</span>
+umur  <span class="op">=</span> <span class="fn">int</span><span class="punc">(</span><span class="fn">input</span><span class="punc">(</span><span class="str">"Masukkan umur  : "</span><span class="punc">))</span>   <span class="cmt"># wajib convert ke int</span>
+nilai <span class="op">=</span> <span class="fn">float</span><span class="punc">(</span><span class="fn">input</span><span class="punc">(</span><span class="str">"Masukkan nilai : "</span><span class="punc">))</span> <span class="cmt"># wajib convert ke float</span>
+
+<span class="cmt"># PRINT — berbagai cara</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"Halo,"</span><span class="punc">,</span> nama<span class="punc">)</span>                       <span class="cmt"># pakai koma</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"Umur  :"</span><span class="punc">,</span> umur<span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Nilai : <span class="fmt">{nilai:.2f}</span>"</span><span class="punc">)</span>               <span class="cmt"># f-string</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Halo <span class="fmt">{nama}</span>, umur <span class="fmt">{umur}</span> tahun!"</span><span class="punc">)</span>   <span class="cmt"># f-string lebih lengkap</span>
+
+<span class="cmt"># print dengan separator dan end</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"A"</span><span class="punc">,</span> <span class="str">"B"</span><span class="punc">,</span> <span class="str">"C"</span><span class="punc">,</span> sep<span class="op">=</span><span class="str">"-"</span><span class="punc">)</span>               <span class="cmt"># A-B-C</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"Baris ini"</span><span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"nyambung!"</span><span class="punc">)</span>                          <span class="cmt"># tidak pindah baris</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann pink"><span class="ann-code">int(input(...))</span><span class="ann-desc"><code>input()</code> selalu mengembalikan string — jadi kalau mau angka, wajib dibungkus <code>int()</code> atau <code>float()</code>. Ini kesalahan paling umum pemula Python.</span></div>
+    <div class="ann green"><span class="ann-code">f"teks {variabel}"</span><span class="ann-desc">F-string — cara paling modern dan rapi menyisipkan variabel ke teks. Awali string dengan huruf <code>f</code>, lalu variabel ditulis di dalam <code>{}</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">{nilai:.2f}</span><span class="ann-desc">Format angka di dalam f-string — <code>:.2f</code> artinya tampilkan 2 desimal. Mirip <code>%.2f</code> di C tapi lebih intuitif.</span></div>
+    <div class="ann"><span class="ann-code">sep= dan end=</span><span class="ann-desc"><code>sep</code> = pemisah antar argumen (default spasi). <code>end</code> = karakter di akhir print (default newline). Keduanya opsional.</span></div>
+  </div>
+  <div class="output-label">Output (contoh input: Budi, 20, 87.5)</div>
+  <div class="output-box"><span class="output-dim">Masukkan nama  : </span><span class="output-input">Budi</span>
+<span class="output-dim">Masukkan umur  : </span><span class="output-input">20</span>
+<span class="output-dim">Masukkan nilai : </span><span class="output-input">87.5</span>
+Halo, Budi
+Umur  : 20
+Nilai : 87.50
+Halo Budi, umur 20 tahun!
+A-B-C
+Baris ini nyambung!</div>
+</div>
+
+<hr class="divider">
+
+<!-- 4. OPERATOR -->
+<div class="section" id="operator" style="animation-delay:0.2s">
+  <div class="section-header"><div class="section-num">4</div><h2>Operator</h2></div>
+  <p class="desc">Python punya semua operator yang ada di C, plus beberapa operator khas Python yang tidak ada di C.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Operator</th><th>Artinya</th><th>Contoh</th><th>Hasil</th></tr></thead>
+    <tbody>
+      <tr><td>+, -, *, /</td><td>Aritmatika dasar</td><td><code>10 / 3</code></td><td>3.333... (selalu float!)</td></tr>
+      <tr><td>//</td><td>Pembagian bulat</td><td><code>10 // 3</code></td><td>3</td></tr>
+      <tr><td>%</td><td>Sisa bagi</td><td><code>10 % 3</code></td><td>1</td></tr>
+      <tr><td>**</td><td>Pangkat</td><td><code>2 ** 8</code></td><td>256</td></tr>
+      <tr><td>==, !=, &gt;, &lt;, &gt;=, &lt;=</td><td>Perbandingan</td><td><code>5 == 5</code></td><td>True / False</td></tr>
+      <tr><td>and, or, not</td><td>Logika</td><td><code>x &gt; 0 and y &gt; 0</code></td><td>True / False</td></tr>
+      <tr><td>in</td><td>Cek keberadaan</td><td><code>"a" in "halo"</code></td><td>True</td></tr>
+      <tr><td>is</td><td>Cek identitas objek</td><td><code>x is None</code></td><td>True / False</td></tr>
+    </tbody>
+  </table></div>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">operator.py</span></div>
+    <pre>a<span class="punc">,</span> b <span class="op">=</span> <span class="num">10</span><span class="punc">,</span> <span class="num">3</span>
+
+<span class="fn">print</span><span class="punc">(</span>a <span class="op">/</span>  b<span class="punc">)</span>    <span class="cmt"># 3.3333 — di Python / selalu float!</span>
+<span class="fn">print</span><span class="punc">(</span>a <span class="op">//</span> b<span class="punc">)</span>    <span class="cmt"># 3      — pembagian bulat</span>
+<span class="fn">print</span><span class="punc">(</span>a <span class="op">%</span>  b<span class="punc">)</span>    <span class="cmt"># 1      — sisa bagi</span>
+<span class="fn">print</span><span class="punc">(</span><span class="num">2</span> <span class="op">**</span> <span class="num">10</span><span class="punc">)</span>   <span class="cmt"># 1024   — pangkat</span>
+
+<span class="cmt"># Logika pakai kata, bukan simbol</span>
+<span class="fn">print</span><span class="punc">(</span><span class="num">5</span> <span class="op">&gt;</span> <span class="num">3</span> <span class="kw">and</span> <span class="num">2</span> <span class="op">&lt;</span> <span class="num">4</span><span class="punc">)</span>   <span class="cmt"># True  (bukan &&)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="num">5</span> <span class="op">&gt;</span> <span class="num">3</span> <span class="kw">or</span>  <span class="num">2</span> <span class="op">&gt;</span> <span class="num">4</span><span class="punc">)</span>   <span class="cmt"># True  (bukan ||)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="kw">not</span> <span class="kw">True</span><span class="punc">)</span>             <span class="cmt"># False (bukan !)</span>
+
+<span class="cmt"># Operator in — khas Python</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"budi"</span> <span class="kw">in</span> <span class="str">"halo budi"</span><span class="punc">)</span>  <span class="cmt"># True</span>
+<span class="fn">print</span><span class="punc">(</span><span class="num">3</span> <span class="kw">in</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">])</span>        <span class="cmt"># True</span>
+<span class="fn">print</span><span class="punc">(</span><span class="num">9</span> <span class="kw">in</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">])</span>        <span class="cmt"># False</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann pink"><span class="ann-code">/ selalu float</span><span class="ann-desc">Beda dari C! Di Python <code>10 / 3 = 3.333</code>, bukan 3. Kalau mau hasil bulat, pakai <code>//</code> (floor division).</span></div>
+    <div class="ann green"><span class="ann-code">**</span><span class="ann-desc">Operator pangkat khas Python — tidak ada di C. Di C harus pakai fungsi <code>pow()</code> dari math.h, di Python cukup <code>2 ** 8</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">and, or, not</span><span class="ann-desc">Python pakai kata asli bahasa Inggris, bukan simbol seperti C (<code>&amp;&amp;</code>, <code>||</code>, <code>!</code>). Lebih mudah dibaca.</span></div>
+    <div class="ann blue"><span class="ann-code">in</span><span class="ann-desc">Operator khas Python — cek apakah sesuatu ada di dalam list, string, tuple, atau dictionary. Sangat berguna dan tidak ada di C.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">3.3333333333333335
+3
+1
+1024
+True
+True
+False
+True
+True
+False</div>
+</div>
+
+<hr class="divider">
+
+<!-- 5. STRING -->
+<div class="section" id="string" style="animation-delay:0.25s">
+  <div class="section-header"><div class="section-num">5</div><h2>String — "Teks di Python"</h2></div>
+  <p class="desc">String di Python jauh lebih powerful dari <code>char[]</code> di C. Bisa dislice, disambung, dibalik, dicari, diganti — semua dengan cara yang mudah.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">string.py</span></div>
+    <pre>s <span class="op">=</span> <span class="str">"Belajar Python"</span>
+
+<span class="cmt"># Panjang string</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">len</span><span class="punc">(</span>s<span class="punc">))</span>            <span class="cmt"># 14</span>
+
+<span class="cmt"># Akses karakter — index mulai dari 0</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">[</span><span class="num">0</span><span class="punc">])</span>             <span class="cmt"># B</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">[</span><span class="op">-</span><span class="num">1</span><span class="punc">])</span>            <span class="cmt"># n (index negatif dari belakang)</span>
+
+<span class="cmt"># Slicing — ambil sebagian string</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">[</span><span class="num">0</span><span class="punc">:</span><span class="num">7</span><span class="punc">])</span>          <span class="cmt"># Belajar</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">[</span><span class="num">8</span><span class="punc">:])</span>           <span class="cmt"># Python</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">[::-</span><span class="num">1</span><span class="punc">])</span>         <span class="cmt"># nohtyP rajaleBE (dibalik)</span>
+
+<span class="cmt"># Method string</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">.</span><span class="fn">upper</span><span class="punc">())</span>       <span class="cmt"># BELAJAR PYTHON</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">.</span><span class="fn">lower</span><span class="punc">())</span>       <span class="cmt"># belajar python</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">.</span><span class="fn">replace</span><span class="punc">(</span><span class="str">"Python"</span><span class="punc">,</span> <span class="str">"C"</span><span class="punc">))</span>  <span class="cmt"># Belajar C</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">.</span><span class="fn">split</span><span class="punc">(</span><span class="str">" "</span><span class="punc">))</span>     <span class="cmt"># ['Belajar', 'Python']</span>
+<span class="fn">print</span><span class="punc">(</span>s<span class="punc">.</span><span class="fn">startswith</span><span class="punc">(</span><span class="str">"Bel"</span><span class="punc">))</span>  <span class="cmt"># True</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">" halo "</span><span class="punc">.</span><span class="fn">strip</span><span class="punc">())</span> <span class="cmt"># "halo" (hapus spasi)</span>
+
+<span class="cmt"># Sambung string</span>
+a <span class="op">=</span> <span class="str">"Halo"</span>
+b <span class="op">=</span> <span class="str">"Budi"</span>
+<span class="fn">print</span><span class="punc">(</span>a <span class="op">+</span> <span class="str">" "</span> <span class="op">+</span> b<span class="punc">)</span>     <span class="cmt"># Halo Budi</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"-"</span> <span class="op">*</span> <span class="num">10</span><span class="punc">)</span>         <span class="cmt"># ----------</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">s[-1]</span><span class="ann-desc">Index negatif — <code>-1</code> artinya karakter terakhir, <code>-2</code> kedua dari belakang, dst. Fitur khas Python yang sangat berguna.</span></div>
+    <div class="ann green"><span class="ann-code">s[0:7]</span><span class="ann-desc">Slicing — ambil karakter dari index 0 sampai 6 (index akhir tidak ikut). Format: <code>[mulai:akhir:langkah]</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">s[::-1]</span><span class="ann-desc">Cara paling keren balik string di Python — slicing dengan langkah -1. Tidak perlu loop sama sekali!</span></div>
+    <div class="ann blue"><span class="ann-code">"teks" * 10</span><span class="ann-desc">String bisa dikali angka — hasilnya string diulang sebanyak itu. Berguna untuk membuat garis pemisah.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">14
+B
+n
+Belajar
+Python
+nohtyP rajaleBE
+BELAJAR PYTHON
+belajar python
+Belajar C
+['Belajar', 'Python']
+True
+halo
+Halo Budi
+----------</div>
+</div>
+
+<hr class="divider">
+
+<!-- 6. IF/ELIF/ELSE -->
+<div class="section" id="ifelse" style="animation-delay:0.3s">
+  <div class="section-header"><div class="section-num">6</div><h2>if / elif / else</h2></div>
+  <p class="desc">Percabangan di Python mirip C tapi tanpa kurung kurawal. Pakai indentasi dan tanda titik dua <code>:</code> di akhir kondisi. Tidak ada <code>else if</code> — di Python namanya <code>elif</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">ifelse.py</span></div>
+    <pre>nilai <span class="op">=</span> <span class="fn">float</span><span class="punc">(</span><span class="fn">input</span><span class="punc">(</span><span class="str">"Masukkan nilai : "</span><span class="punc">))</span>
+
+<span class="kw">if</span> nilai <span class="op">&gt;=</span> <span class="num">85</span><span class="punc">:</span>
+    grade <span class="op">=</span> <span class="str">"A"</span>
+<span class="kw">elif</span> nilai <span class="op">&gt;=</span> <span class="num">75</span><span class="punc">:</span>
+    grade <span class="op">=</span> <span class="str">"B"</span>
+<span class="kw">elif</span> nilai <span class="op">&gt;=</span> <span class="num">65</span><span class="punc">:</span>
+    grade <span class="op">=</span> <span class="str">"C"</span>
+<span class="kw">elif</span> nilai <span class="op">&gt;=</span> <span class="num">55</span><span class="punc">:</span>
+    grade <span class="op">=</span> <span class="str">"D"</span>
+<span class="kw">else</span><span class="punc">:</span>
+    grade <span class="op">=</span> <span class="str">"E"</span>
+
+status <span class="op">=</span> <span class="str">"Lulus"</span> <span class="kw">if</span> nilai <span class="op">&gt;=</span> <span class="num">60</span> <span class="kw">else</span> <span class="str">"Tidak Lulus"</span>  <span class="cmt"># ternary</span>
+
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Grade  : <span class="fmt">{grade}</span>"</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Status : <span class="fmt">{status}</span>"</span><span class="punc">)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">if kondisi:</span><span class="ann-desc">Tanda titik dua <code>:</code> wajib ada di akhir setiap kondisi if/elif/else. Ini pengganti kurung kurawal <code>{</code> di C.</span></div>
+    <div class="ann green"><span class="ann-code">elif</span><span class="ann-desc">Singkatan dari "else if". Di C ditulis <code>else if</code> (dua kata), di Python <code>elif</code> (satu kata).</span></div>
+    <div class="ann yellow"><span class="ann-code">A if kondisi else B</span><span class="ann-desc">Ternary operator Python — lebih mudah dibaca dari C. Baca: "nilai A kalau kondisi benar, nilai B kalau salah".</span></div>
+  </div>
+  <div class="output-label">Output (contoh input: 78)</div>
+  <div class="output-box"><span class="output-dim">Masukkan nilai : </span><span class="output-input">78</span>
+Grade  : B
+Status : Lulus</div>
+</div>
+
+<hr class="divider">
+
+<!-- 7. LOOP -->
+<div class="section" id="loop" style="animation-delay:0.35s">
+  <div class="section-header"><div class="section-num">7</div><h2>Loop — "for & while"</h2></div>
+  <p class="desc">Python punya <code>for</code> dan <code>while</code>. Tidak ada <code>do-while</code> di Python. <code>for</code> di Python jauh lebih fleksibel dari C — bisa langsung iterasi list, string, dictionary, dll.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">loop.py</span></div>
+    <pre><span class="cmt"># FOR dengan range()</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">5</span><span class="punc">):</span>          <span class="cmt"># 0,1,2,3,4</span>
+    <span class="fn">print</span><span class="punc">(</span>i<span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">()</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span> <span class="num">6</span><span class="punc">):</span>      <span class="cmt"># 1,2,3,4,5</span>
+    <span class="fn">print</span><span class="punc">(</span>i<span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">()</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">10</span><span class="punc">,</span> <span class="num">0</span><span class="punc">,</span> <span class="op">-</span><span class="num">2</span><span class="punc">):</span> <span class="cmt"># 10,8,6,4,2 (mundur)</span>
+    <span class="fn">print</span><span class="punc">(</span>i<span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">()</span>
+
+<span class="cmt"># FOR langsung iterasi list</span>
+buah <span class="op">=</span> <span class="punc">[</span><span class="str">"apel"</span><span class="punc">,</span> <span class="str">"mangga"</span><span class="punc">,</span> <span class="str">"jeruk"</span><span class="punc">]</span>
+<span class="kw">for</span> b <span class="kw">in</span> buah<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Buah: <span class="fmt">{b}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># FOR dengan enumerate() — dapat index sekaligus</span>
+<span class="kw">for</span> i<span class="punc">,</span> b <span class="kw">in</span> <span class="fn">enumerate</span><span class="punc">(</span>buah<span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{i}</span>: <span class="fmt">{b}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># WHILE</span>
+n <span class="op">=</span> <span class="num">1</span>
+<span class="kw">while</span> n <span class="op">&lt;=</span> <span class="num">3</span><span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"while ke-<span class="fmt">{n}</span>"</span><span class="punc">)</span>
+    n <span class="op">+=</span> <span class="num">1</span>
+
+<span class="cmt"># break dan continue</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">10</span><span class="punc">):</span>
+    <span class="kw">if</span> i <span class="op">==</span> <span class="num">5</span><span class="punc">:</span> <span class="kw">break</span>
+    <span class="kw">if</span> i <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="punc">:</span> <span class="kw">continue</span>
+    <span class="fn">print</span><span class="punc">(</span>i<span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>  <span class="cmt"># 1 3 (skip genap, berhenti di 5)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">range(start, stop, step)</span><span class="ann-desc">Buat urutan angka. <code>range(5)</code> = 0 sampai 4. <code>range(1,6)</code> = 1 sampai 5. <code>range(10,0,-2)</code> = mundur dari 10.</span></div>
+    <div class="ann green"><span class="ann-code">for b in buah:</span><span class="ann-desc">For di Python bisa langsung iterasi list tanpa index — jauh lebih simpel dari C. Ini cara paling idiomatik di Python.</span></div>
+    <div class="ann yellow"><span class="ann-code">enumerate()</span><span class="ann-desc">Dapat index dan nilai sekaligus saat iterasi — tidak perlu variabel counter terpisah.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">0 1 2 3 4
+1 2 3 4 5
+10 8 6 4 2
+Buah: apel
+Buah: mangga
+Buah: jeruk
+0: apel
+1: mangga
+2: jeruk
+while ke-1
+while ke-2
+while ke-3
+1 3</div>
+</div>
+
+<hr class="divider">
+
+<!-- 8. LIST -->
+<div class="section" id="list" style="animation-delay:0.4s">
+  <div class="section-header"><div class="section-num">8</div><h2>List — "Array yang Lebih Canggih"</h2></div>
+  <p class="desc">List adalah versi super dari array di C. Isinya bisa campur tipe data, ukurannya bisa berubah, dan punya banyak method bawaan yang berguna.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">list.py</span></div>
+    <pre>nilai <span class="op">=</span> <span class="punc">[</span><span class="num">80</span><span class="punc">,</span> <span class="num">90</span><span class="punc">,</span> <span class="num">75</span><span class="punc">,</span> <span class="num">85</span><span class="punc">,</span> <span class="num">70</span><span class="punc">]</span>
+
+<span class="cmt"># Akses</span>
+<span class="fn">print</span><span class="punc">(</span>nilai<span class="punc">[</span><span class="num">0</span><span class="punc">])</span>          <span class="cmt"># 80</span>
+<span class="fn">print</span><span class="punc">(</span>nilai<span class="punc">[</span><span class="op">-</span><span class="num">1</span><span class="punc">])</span>         <span class="cmt"># 70</span>
+<span class="fn">print</span><span class="punc">(</span>nilai<span class="punc">[</span><span class="num">1</span><span class="punc">:</span><span class="num">4</span><span class="punc">])</span>        <span class="cmt"># [90, 75, 85]</span>
+
+<span class="cmt"># Modifikasi</span>
+nilai<span class="punc">.</span><span class="fn">append</span><span class="punc">(</span><span class="num">95</span><span class="punc">)</span>         <span class="cmt"># tambah di belakang</span>
+nilai<span class="punc">.</span><span class="fn">insert</span><span class="punc">(</span><span class="num">0</span><span class="punc">,</span> <span class="num">60</span><span class="punc">)</span>      <span class="cmt"># sisipkan di index 0</span>
+nilai<span class="punc">.</span><span class="fn">remove</span><span class="punc">(</span><span class="num">75</span><span class="punc">)</span>         <span class="cmt"># hapus nilai 75</span>
+nilai<span class="punc">.</span><span class="fn">pop</span><span class="punc">()</span>              <span class="cmt"># hapus elemen terakhir</span>
+nilai<span class="punc">.</span><span class="fn">pop</span><span class="punc">(</span><span class="num">0</span><span class="punc">)</span>             <span class="cmt"># hapus index 0</span>
+
+<span class="cmt"># Info</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">len</span><span class="punc">(</span>nilai<span class="punc">))</span>         <span class="cmt"># panjang list</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">sum</span><span class="punc">(</span>nilai<span class="punc">))</span>         <span class="cmt"># total semua elemen</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">max</span><span class="punc">(</span>nilai<span class="punc">))</span>         <span class="cmt"># nilai terbesar</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">min</span><span class="punc">(</span>nilai<span class="punc">))</span>         <span class="cmt"># nilai terkecil</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">sorted</span><span class="punc">(</span>nilai<span class="punc">))</span>      <span class="cmt"># urutkan (tidak ubah asli)</span>
+nilai<span class="punc">.</span><span class="fn">sort</span><span class="punc">()</span>              <span class="cmt"># urutkan (ubah langsung)</span>
+nilai<span class="punc">.</span><span class="fn">reverse</span><span class="punc">()</span>           <span class="cmt"># balik urutan</span>
+
+<span class="cmt"># List bisa campur tipe</span>
+campur <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span> <span class="str">"halo"</span><span class="punc">,</span> <span class="num">3.14</span><span class="punc">,</span> <span class="kw">True</span><span class="punc">]</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">append()</span><span class="ann-desc">Tambah elemen di akhir list. Inilah kenapa list lebih fleksibel dari array C — ukurannya bisa bertambah kapanpun.</span></div>
+    <div class="ann green"><span class="ann-code">sum(), max(), min()</span><span class="ann-desc">Fungsi bawaan Python untuk list angka — tidak perlu loop manual untuk hitung total, maksimum, atau minimum.</span></div>
+    <div class="ann yellow"><span class="ann-code">sorted() vs sort()</span><span class="ann-desc"><code>sorted()</code> mengembalikan list baru yang sudah diurutkan tanpa mengubah list asli. <code>sort()</code> mengubah list aslinya langsung.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 9. TUPLE -->
+<div class="section" id="tuple" style="animation-delay:0.45s">
+  <div class="section-header"><div class="section-num">9</div><h2>Tuple — "List yang Tidak Bisa Diubah"</h2></div>
+  <p class="desc">Tuple mirip list tapi isinya tidak bisa diubah setelah dibuat. Pakai kurung biasa <code>()</code> bukan kurung siku. Cocok untuk data yang memang tidak boleh berubah.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">tuple.py</span></div>
+    <pre>koordinat <span class="op">=</span> <span class="punc">(</span><span class="num">10</span><span class="punc">,</span> <span class="num">20</span><span class="punc">)</span>
+warna     <span class="op">=</span> <span class="punc">(</span><span class="str">"merah"</span><span class="punc">,</span> <span class="str">"hijau"</span><span class="punc">,</span> <span class="str">"biru"</span><span class="punc">)</span>
+
+<span class="cmt"># Akses sama seperti list</span>
+<span class="fn">print</span><span class="punc">(</span>koordinat<span class="punc">[</span><span class="num">0</span><span class="punc">])</span>    <span class="cmt"># 10</span>
+<span class="fn">print</span><span class="punc">(</span>warna<span class="punc">[</span><span class="op">-</span><span class="num">1</span><span class="punc">])</span>      <span class="cmt"># biru</span>
+
+<span class="cmt"># Tuple unpacking — keren!</span>
+x<span class="punc">,</span> y <span class="op">=</span> koordinat
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"x=<span class="fmt">{x}</span>, y=<span class="fmt">{y}</span>"</span><span class="punc">)</span>   <span class="cmt"># x=10, y=20</span>
+
+r<span class="punc">,</span> g<span class="punc">,</span> b <span class="op">=</span> warna
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"RGB: <span class="fmt">{r}</span>, <span class="fmt">{g}</span>, <span class="fmt">{b}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># Fungsi bisa return banyak nilai (lewat tuple)</span>
+<span class="kw">def</span> <span class="fn">hitung</span><span class="punc">(</span>a<span class="punc">,</span> b<span class="punc">):</span>
+    <span class="kw">return</span> a <span class="op">+</span> b<span class="punc">,</span> a <span class="op">*</span> b     <span class="cmt"># return tuple</span>
+
+jumlah<span class="punc">,</span> kali <span class="op">=</span> <span class="fn">hitung</span><span class="punc">(</span><span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Jumlah=<span class="fmt">{jumlah}</span>, Kali=<span class="fmt">{kali}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># koordinat[0] = 99  ← ERROR! tuple tidak bisa diubah</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">x, y = koordinat</span><span class="ann-desc">Tuple unpacking — assign isi tuple ke beberapa variabel sekaligus dalam satu baris. Sangat berguna dan khas Python.</span></div>
+    <div class="ann green"><span class="ann-code">return a+b, a*b</span><span class="ann-desc">Fungsi Python bisa return banyak nilai sekaligus lewat tuple. Di C hanya bisa return satu nilai.</span></div>
+    <div class="ann yellow"><span class="ann-code">Kapan pakai tuple?</span><span class="ann-desc">Pakai tuple untuk data yang tidak boleh diubah (koordinat, RGB, hari dalam seminggu). Pakai list kalau perlu dimodifikasi.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">10
+biru
+x=10, y=20
+RGB: merah, hijau, biru
+Jumlah=7, Kali=12</div>
+</div>
+
+<hr class="divider">
+
+<!-- 10. DICTIONARY -->
+<div class="section" id="dictionary" style="animation-delay:0.5s">
+  <div class="section-header"><div class="section-num">10</div><h2>Dictionary — "Data dengan Label"</h2></div>
+  <p class="desc">Dictionary menyimpan data dalam pasangan kunci-nilai (key-value). Mirip struct di C tapi lebih fleksibel — key bisa string, nilai bisa apa saja.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">dictionary.py</span></div>
+    <pre>mahasiswa <span class="op">=</span> <span class="punc">{</span>
+    <span class="str">"nama"</span>   <span class="punc">:</span> <span class="str">"Budi"</span><span class="punc">,</span>
+    <span class="str">"nim"</span>    <span class="punc">:</span> <span class="str">"2024001"</span><span class="punc">,</span>
+    <span class="str">"jurusan"</span><span class="punc">:</span> <span class="str">"Informatika"</span><span class="punc">,</span>
+    <span class="str">"ipk"</span>    <span class="punc">:</span> <span class="num">3.75</span>
+<span class="punc">}</span>
+
+<span class="cmt"># Akses nilai</span>
+<span class="fn">print</span><span class="punc">(</span>mahasiswa<span class="punc">[</span><span class="str">"nama"</span><span class="punc">])</span>              <span class="cmt"># Budi</span>
+<span class="fn">print</span><span class="punc">(</span>mahasiswa<span class="punc">.</span><span class="fn">get</span><span class="punc">(</span><span class="str">"ipk"</span><span class="punc">))</span>           <span class="cmt"># 3.75</span>
+<span class="fn">print</span><span class="punc">(</span>mahasiswa<span class="punc">.</span><span class="fn">get</span><span class="punc">(</span><span class="str">"alamat"</span><span class="punc">,</span> <span class="str">"N/A"</span><span class="punc">))</span> <span class="cmt"># N/A (key tidak ada)</span>
+
+<span class="cmt"># Tambah / ubah</span>
+mahasiswa<span class="punc">[</span><span class="str">"email"</span><span class="punc">]</span> <span class="op">=</span> <span class="str">"budi@mail.com"</span>
+mahasiswa<span class="punc">[</span><span class="str">"ipk"</span><span class="punc">]</span>   <span class="op">=</span> <span class="num">3.80</span>
+
+<span class="cmt"># Hapus</span>
+<span class="kw">del</span> mahasiswa<span class="punc">[</span><span class="str">"email"</span><span class="punc">]</span>
+
+<span class="cmt"># Iterasi</span>
+<span class="kw">for</span> key<span class="punc">,</span> val <span class="kw">in</span> mahasiswa<span class="punc">.</span><span class="fn">items</span><span class="punc">():</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{key}</span> : <span class="fmt">{val}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># Cek keberadaan key</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">"nama"</span> <span class="kw">in</span> mahasiswa<span class="punc">)</span>    <span class="cmt"># True</span>
+<span class="fn">print</span><span class="punc">(</span>mahasiswa<span class="punc">.</span><span class="fn">keys</span><span class="punc">())</span>      <span class="cmt"># semua key</span>
+<span class="fn">print</span><span class="punc">(</span>mahasiswa<span class="punc">.</span><span class="fn">values</span><span class="punc">())</span>    <span class="cmt"># semua nilai</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">dict["key"]</span><span class="ann-desc">Akses nilai dengan key. Kalau key tidak ada, akan error. Gunakan <code>.get()</code> untuk akses yang lebih aman.</span></div>
+    <div class="ann green"><span class="ann-code">.get(key, default)</span><span class="ann-desc">Versi aman dari akses dictionary — kalau key tidak ada, return nilai default (tidak error).</span></div>
+    <div class="ann yellow"><span class="ann-code">.items()</span><span class="ann-desc">Iterasi dictionary dapat key dan value sekaligus. Lebih praktis dari iterasi manual.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Budi
+3.75
+N/A
+nama : Budi
+nim : 2024001
+jurusan : Informatika
+ipk : 3.8
+True</div>
+</div>
+
+<hr class="divider">
+
+<!-- 11. SET -->
+<div class="section" id="set" style="animation-delay:0.55s">
+  <div class="section-header"><div class="section-num">11</div><h2>Set — "Kumpulan Unik"</h2></div>
+  <p class="desc">Set adalah kumpulan data tanpa duplikat dan tanpa urutan. Berguna untuk menghapus duplikat dari list atau melakukan operasi himpunan seperti irisan dan gabungan.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">set.py</span></div>
+    <pre><span class="cmt"># Buat set</span>
+buah <span class="op">=</span> <span class="punc">{</span><span class="str">"apel"</span><span class="punc">,</span> <span class="str">"mangga"</span><span class="punc">,</span> <span class="str">"jeruk"</span><span class="punc">,</span> <span class="str">"apel"</span><span class="punc">}</span>
+<span class="fn">print</span><span class="punc">(</span>buah<span class="punc">)</span>             <span class="cmt"># {'apel', 'jeruk', 'mangga'} — apel hanya 1!</span>
+
+<span class="cmt"># Hapus duplikat dari list</span>
+angka <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">]</span>
+unik <span class="op">=</span> <span class="fn">list</span><span class="punc">(</span><span class="fn">set</span><span class="punc">(</span>angka<span class="punc">))</span>
+<span class="fn">print</span><span class="punc">(</span>unik<span class="punc">)</span>              <span class="cmt"># [1, 2, 3, 4]</span>
+
+<span class="cmt"># Operasi himpunan</span>
+A <span class="op">=</span> <span class="punc">{</span><span class="num">1</span><span class="punc">,</span> <span class="num">2</span><span class="punc">,</span> <span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">}</span>
+B <span class="op">=</span> <span class="punc">{</span><span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">,</span> <span class="num">5</span><span class="punc">,</span> <span class="num">6</span><span class="punc">}</span>
+<span class="fn">print</span><span class="punc">(</span>A <span class="op">|</span> B<span class="punc">)</span>    <span class="cmt"># gabungan  : {1,2,3,4,5,6}</span>
+<span class="fn">print</span><span class="punc">(</span>A <span class="op">&amp;</span> B<span class="punc">)</span>    <span class="cmt"># irisan    : {3,4}</span>
+<span class="fn">print</span><span class="punc">(</span>A <span class="op">-</span> B<span class="punc">)</span>    <span class="cmt"># selisih   : {1,2}</span>
+<span class="fn">print</span><span class="punc">(</span>A <span class="op">^</span> B<span class="punc">)</span>    <span class="cmt"># beda keduanya: {1,2,5,6}</span>
+
+<span class="cmt"># Add / remove</span>
+buah<span class="punc">.</span><span class="fn">add</span><span class="punc">(</span><span class="str">"pisang"</span><span class="punc">)</span>
+buah<span class="punc">.</span><span class="fn">discard</span><span class="punc">(</span><span class="str">"mangga"</span><span class="punc">)</span>  <span class="cmt"># aman walau tidak ada</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">set(list)</span><span class="ann-desc">Cara paling cepat hapus duplikat dari list — convert ke set (duplikat hilang otomatis), lalu convert balik ke list.</span></div>
+    <div class="ann green"><span class="ann-code">A | B, A &amp; B, A - B</span><span class="ann-desc">Operasi himpunan matematika langsung bisa pakai operator. Berguna untuk perbandingan data.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 12. FUNGSI -->
+<div class="section" id="fungsi" style="animation-delay:0.6s">
+  <div class="section-header"><div class="section-num">12</div><h2>Fungsi</h2></div>
+  <p class="desc">Fungsi di Python didefinisikan dengan kata kunci <code>def</code>. Tidak perlu deklarasi tipe return value atau tipe parameter — Python cukup fleksibel.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">fungsi.py</span></div>
+    <pre><span class="cmt"># Fungsi dasar</span>
+<span class="kw">def</span> <span class="fn">sapa</span><span class="punc">(</span>nama<span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Halo, <span class="fmt">{nama}</span>!"</span><span class="punc">)</span>
+
+<span class="cmt"># Fungsi dengan return</span>
+<span class="kw">def</span> <span class="fn">luas_lingkaran</span><span class="punc">(</span>r<span class="punc">):</span>
+    <span class="kw">return</span> <span class="num">3.14</span> <span class="op">*</span> r <span class="op">**</span> <span class="num">2</span>
+
+<span class="cmt"># Parameter default</span>
+<span class="kw">def</span> <span class="fn">perkenalan</span><span class="punc">(</span>nama<span class="punc">,</span> kota<span class="op">=</span><span class="str">"Jakarta"</span><span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{nama}</span> dari <span class="fmt">{kota}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># *args — terima banyak argumen</span>
+<span class="kw">def</span> <span class="fn">total</span><span class="punc">(</span><span class="op">*</span>angka<span class="punc">):</span>
+    <span class="kw">return</span> <span class="fn">sum</span><span class="punc">(</span>angka<span class="punc">)</span>
+
+<span class="cmt"># **kwargs — terima argumen bernama</span>
+<span class="kw">def</span> <span class="fn">profil</span><span class="punc">(</span><span class="op">**</span>data<span class="punc">):</span>
+    <span class="kw">for</span> k<span class="punc">,</span> v <span class="kw">in</span> data<span class="punc">.</span><span class="fn">items</span><span class="punc">():</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{k}</span>: <span class="fmt">{v}</span>"</span><span class="punc">)</span>
+
+<span class="fn">sapa</span><span class="punc">(</span><span class="str">"Budi"</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">luas_lingkaran</span><span class="punc">(</span><span class="num">7</span><span class="punc">))</span>
+<span class="fn">perkenalan</span><span class="punc">(</span><span class="str">"Ani"</span><span class="punc">)</span>              <span class="cmt"># pakai default</span>
+<span class="fn">perkenalan</span><span class="punc">(</span><span class="str">"Budi"</span><span class="punc">,</span> <span class="str">"Bandung"</span><span class="punc">)</span>  <span class="cmt"># override default</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">total</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">,</span><span class="num">5</span><span class="punc">))</span>
+<span class="fn">profil</span><span class="punc">(</span>nama<span class="op">=</span><span class="str">"Budi"</span><span class="punc">,</span> umur<span class="op">=</span><span class="num">20</span><span class="punc">)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">def nama(param):</span><span class="ann-desc">Kata kunci <code>def</code> untuk mendefinisikan fungsi. Tidak perlu tulis tipe data parameter atau return value.</span></div>
+    <div class="ann green"><span class="ann-code">kota="Jakarta"</span><span class="ann-desc">Parameter default — kalau argumen tidak diberikan, pakai nilai default. Tidak ada fitur ini di C.</span></div>
+    <div class="ann yellow"><span class="ann-code">*args</span><span class="ann-desc">Terima jumlah argumen yang tidak terbatas — semua terkumpul dalam tuple. Berguna untuk fungsi yang fleksibel.</span></div>
+    <div class="ann orange"><span class="ann-code">**kwargs</span><span class="ann-desc">Terima argumen bernama (key=value) yang tidak terbatas — terkumpul dalam dictionary.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Halo, Budi!
+153.86
+Ani dari Jakarta
+Budi dari Bandung
+15
+nama: Budi
+umur: 20</div>
+</div>
+
+<hr class="divider">
+
+<!-- 13. LAMBDA -->
+<div class="section" id="lambda" style="animation-delay:0.65s">
+  <div class="section-header"><div class="section-num">13</div><h2>Lambda — "Fungsi Satu Baris"</h2></div>
+  <p class="desc">Lambda adalah fungsi anonim (tanpa nama) yang ditulis dalam satu baris. Sering dipakai sebagai argumen untuk fungsi lain seperti <code>sorted()</code>, <code>map()</code>, dan <code>filter()</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">lambda.py</span></div>
+    <pre><span class="cmt"># Lambda dasar</span>
+kuadrat <span class="op">=</span> <span class="kw">lambda</span> x<span class="punc">:</span> x <span class="op">**</span> <span class="num">2</span>
+tambah  <span class="op">=</span> <span class="kw">lambda</span> a<span class="punc">,</span> b<span class="punc">:</span> a <span class="op">+</span> b
+<span class="fn">print</span><span class="punc">(</span><span class="fn">kuadrat</span><span class="punc">(</span><span class="num">5</span><span class="punc">))</span>         <span class="cmt"># 25</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">tambah</span><span class="punc">(</span><span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">))</span>       <span class="cmt"># 7</span>
+
+<span class="cmt"># sorted() dengan key lambda</span>
+mahasiswa <span class="op">=</span> <span class="punc">[</span>
+    <span class="punc">{</span><span class="str">"nama"</span><span class="punc">:</span> <span class="str">"Budi"</span><span class="punc">,</span>  <span class="str">"ipk"</span><span class="punc">:</span> <span class="num">3.5</span><span class="punc">},</span>
+    <span class="punc">{</span><span class="str">"nama"</span><span class="punc">:</span> <span class="str">"Ani"</span><span class="punc">,</span>   <span class="str">"ipk"</span><span class="punc">:</span> <span class="num">3.8</span><span class="punc">},</span>
+    <span class="punc">{</span><span class="str">"nama"</span><span class="punc">:</span> <span class="str">"Cinta"</span><span class="punc">,</span> <span class="str">"ipk"</span><span class="punc">:</span> <span class="num">3.2</span><span class="punc">},</span>
+<span class="punc">]</span>
+urut <span class="op">=</span> <span class="fn">sorted</span><span class="punc">(</span>mahasiswa<span class="punc">,</span> key<span class="op">=</span><span class="kw">lambda</span> m<span class="punc">:</span> m<span class="punc">[</span><span class="str">"ipk"</span><span class="punc">],</span> reverse<span class="op">=</span><span class="kw">True</span><span class="punc">)</span>
+<span class="kw">for</span> m <span class="kw">in</span> urut<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{m['nama']}</span>: <span class="fmt">{m['ipk']}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># map() dan filter()</span>
+angka  <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">,</span><span class="num">5</span><span class="punc">]</span>
+kuadrat_semua <span class="op">=</span> <span class="fn">list</span><span class="punc">(</span><span class="fn">map</span><span class="punc">(</span><span class="kw">lambda</span> x<span class="punc">:</span> x<span class="op">**</span><span class="num">2</span><span class="punc">,</span> angka<span class="punc">))</span>
+genap_saja    <span class="op">=</span> <span class="fn">list</span><span class="punc">(</span><span class="fn">filter</span><span class="punc">(</span><span class="kw">lambda</span> x<span class="punc">:</span> x<span class="op">%</span><span class="num">2</span><span class="op">==</span><span class="num">0</span><span class="punc">,</span> angka<span class="punc">))</span>
+<span class="fn">print</span><span class="punc">(</span>kuadrat_semua<span class="punc">)</span>  <span class="cmt"># [1,4,9,16,25]</span>
+<span class="fn">print</span><span class="punc">(</span>genap_saja<span class="punc">)</span>     <span class="cmt"># [2,4]</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">lambda x: ekspresi</span><span class="ann-desc">Fungsi anonim satu baris. <code>lambda x: x**2</code> sama dengan fungsi yang menerima x dan return x kuadrat.</span></div>
+    <div class="ann green"><span class="ann-code">sorted(key=lambda...)</span><span class="ann-desc">Lambda paling sering dipakai sebagai key sorting — tentukan berdasarkan apa data diurutkan.</span></div>
+    <div class="ann yellow"><span class="ann-code">map() dan filter()</span><span class="ann-desc"><code>map()</code> = terapkan fungsi ke semua elemen. <code>filter()</code> = ambil elemen yang memenuhi kondisi. Keduanya return iterator, perlu dibungkus <code>list()</code>.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">25
+7
+Ani: 3.8
+Budi: 3.5
+Cinta: 3.2
+[1, 4, 9, 16, 25]
+[2, 4]</div>
+</div>
+
+<hr class="divider">
+
+<!-- 14. SCOPE -->
+<div class="section" id="scope" style="animation-delay:0.7s">
+  <div class="section-header"><div class="section-num">14</div><h2>Scope Variabel — "Di Mana Variabel Bisa Diakses"</h2></div>
+  <p class="desc">Scope menentukan di mana sebuah variabel bisa diakses. Python punya scope lokal (dalam fungsi) dan global (di luar fungsi).</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">scope.py</span></div>
+    <pre>x <span class="op">=</span> <span class="str">"global"</span>   <span class="cmt"># variabel global</span>
+
+<span class="kw">def</span> <span class="fn">fungsi_a</span><span class="punc">():</span>
+    x <span class="op">=</span> <span class="str">"lokal"</span>  <span class="cmt"># variabel lokal, beda dengan x global</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Dalam fungsi: <span class="fmt">{x}</span>"</span><span class="punc">)</span>
+
+<span class="kw">def</span> <span class="fn">fungsi_b</span><span class="punc">():</span>
+    <span class="kw">global</span> x    <span class="cmt"># pakai dan ubah variabel global</span>
+    x <span class="op">=</span> <span class="str">"diubah global"</span>
+
+<span class="fn">fungsi_a</span><span class="punc">()</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Di luar: <span class="fmt">{x}</span>"</span><span class="punc">)</span>    <span class="cmt"># masih "global"</span>
+
+<span class="fn">fungsi_b</span><span class="punc">()</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Setelah fungsi_b: <span class="fmt">{x}</span>"</span><span class="punc">)</span>  <span class="cmt"># "diubah global"</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">variabel lokal</span><span class="ann-desc">Variabel yang dibuat di dalam fungsi hanya bisa diakses di dalam fungsi itu. Di luar fungsi tidak ada.</span></div>
+    <div class="ann yellow"><span class="ann-code">global x</span><span class="ann-desc">Kata kunci <code>global</code> memberitahu Python "pakai variabel global, bukan buat variabel lokal baru". Tanpa ini, <code>x = ...</code> di dalam fungsi akan buat variabel lokal baru.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Dalam fungsi: lokal
+Di luar: global
+Setelah fungsi_b: diubah global</div>
+</div>
+
+<hr class="divider">
+
+<!-- 15. IMPORT & MODULE -->
+<div class="section" id="module" style="animation-delay:0.75s">
+  <div class="section-header"><div class="section-num">15</div><h2>import & Module — "Pakai Kode dari Luar"</h2></div>
+  <p class="desc">Module adalah file Python berisi fungsi dan variabel yang bisa diimpor ke program lain. Python punya banyak module bawaan — tidak perlu install apapun.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">module.py</span></div>
+    <pre><span class="cmt"># Import module penuh</span>
+<span class="kw">import</span> <span class="inc">math</span>
+<span class="fn">print</span><span class="punc">(</span>math<span class="punc">.</span>pi<span class="punc">)</span>           <span class="cmt"># 3.14159...</span>
+<span class="fn">print</span><span class="punc">(</span>math<span class="punc">.</span><span class="fn">sqrt</span><span class="punc">(</span><span class="num">16</span><span class="punc">))</span>     <span class="cmt"># 4.0</span>
+<span class="fn">print</span><span class="punc">(</span>math<span class="punc">.</span><span class="fn">ceil</span><span class="punc">(</span><span class="num">3.2</span><span class="punc">))</span>    <span class="cmt"># 4 (bulatkan ke atas)</span>
+<span class="fn">print</span><span class="punc">(</span>math<span class="punc">.</span><span class="fn">floor</span><span class="punc">(</span><span class="num">3.8</span><span class="punc">))</span>   <span class="cmt"># 3 (bulatkan ke bawah)</span>
+
+<span class="cmt"># Import spesifik</span>
+<span class="kw">from</span> <span class="inc">math</span> <span class="kw">import</span> sqrt<span class="punc">,</span> pi
+<span class="fn">print</span><span class="punc">(</span><span class="fn">sqrt</span><span class="punc">(</span><span class="num">25</span><span class="punc">))</span>           <span class="cmt"># tidak perlu math.sqrt</span>
+
+<span class="cmt"># Module random</span>
+<span class="kw">import</span> <span class="inc">random</span>
+<span class="fn">print</span><span class="punc">(</span>random<span class="punc">.</span><span class="fn">randint</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span> <span class="num">10</span><span class="punc">))</span>    <span class="cmt"># angka acak 1-10</span>
+<span class="fn">print</span><span class="punc">(</span>random<span class="punc">.</span><span class="fn">choice</span><span class="punc">([</span><span class="str">"a"</span><span class="punc">,</span><span class="str">"b"</span><span class="punc">,</span><span class="str">"c"</span><span class="punc">]))</span>  <span class="cmt"># pilih acak dari list</span>
+
+<span class="cmt"># Module datetime</span>
+<span class="kw">from</span> <span class="inc">datetime</span> <span class="kw">import</span> datetime
+<span class="fn">print</span><span class="punc">(</span>datetime<span class="punc">.</span><span class="fn">now</span><span class="punc">())</span>     <span class="cmt"># tanggal & jam sekarang</span>
+
+<span class="cmt"># Module os</span>
+<span class="kw">import</span> <span class="inc">os</span>
+<span class="fn">print</span><span class="punc">(</span>os<span class="punc">.</span><span class="fn">getcwd</span><span class="punc">())</span>        <span class="cmt"># direktori saat ini</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann pink"><span class="ann-code">import math</span><span class="ann-desc">Import module penuh — akses semua isinya dengan format <code>math.fungsi()</code>. Mirip <code>#include &lt;math.h&gt;</code> di C tapi lebih powerful.</span></div>
+    <div class="ann green"><span class="ann-code">from math import sqrt</span><span class="ann-desc">Import spesifik — bisa langsung pakai <code>sqrt()</code> tanpa prefix <code>math.</code>. Lebih ringkas kalau hanya butuh beberapa fungsi saja.</span></div>
+    <div class="ann yellow"><span class="ann-code">import as</span><span class="ann-desc">Bisa kasih alias: <code>import numpy as np</code> — lalu pakai <code>np.array()</code>. Sering dipakai untuk library yang namanya panjang.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 16. FILE I/O -->
+<div class="section" id="file" style="animation-delay:0.8s">
+  <div class="section-header"><div class="section-num">16</div><h2>File I/O — "Simpan & Baca File"</h2></div>
+  <p class="desc">Baca dan tulis file di Python jauh lebih mudah dari C. Tidak perlu <code>fopen</code>/<code>fclose</code> secara manual — Python punya <code>with open()</code> yang otomatis tutup file.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">file-io.py</span></div>
+    <pre><span class="cmt"># TULIS ke file</span>
+<span class="kw">with</span> <span class="fn">open</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"w"</span><span class="punc">)</span> <span class="kw">as</span> f<span class="punc">:</span>
+    f<span class="punc">.</span><span class="fn">write</span><span class="punc">(</span><span class="str">"Nama  : Budi\n"</span><span class="punc">)</span>
+    f<span class="punc">.</span><span class="fn">write</span><span class="punc">(</span><span class="str">"Nilai : 87.5\n"</span><span class="punc">)</span>
+<span class="cmt"># file otomatis ditutup setelah with selesai</span>
+
+<span class="cmt"># TAMBAH (append)</span>
+<span class="kw">with</span> <span class="fn">open</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"a"</span><span class="punc">)</span> <span class="kw">as</span> f<span class="punc">:</span>
+    f<span class="punc">.</span><span class="fn">write</span><span class="punc">(</span><span class="str">"Status: Lulus\n"</span><span class="punc">)</span>
+
+<span class="cmt"># BACA seluruh file</span>
+<span class="kw">with</span> <span class="fn">open</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"r"</span><span class="punc">)</span> <span class="kw">as</span> f<span class="punc">:</span>
+    isi <span class="op">=</span> f<span class="punc">.</span><span class="fn">read</span><span class="punc">()</span>
+    <span class="fn">print</span><span class="punc">(</span>isi<span class="punc">)</span>
+
+<span class="cmt"># BACA per baris</span>
+<span class="kw">with</span> <span class="fn">open</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"r"</span><span class="punc">)</span> <span class="kw">as</span> f<span class="punc">:</span>
+    <span class="kw">for</span> baris <span class="kw">in</span> f<span class="punc">:</span>
+        <span class="fn">print</span><span class="punc">(</span>baris<span class="punc">.</span><span class="fn">strip</span><span class="punc">())</span>  <span class="cmt"># strip() hapus \n</span>
+
+<span class="cmt"># BACA semua baris ke list</span>
+<span class="kw">with</span> <span class="fn">open</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"r"</span><span class="punc">)</span> <span class="kw">as</span> f<span class="punc">:</span>
+    baris_list <span class="op">=</span> f<span class="punc">.</span><span class="fn">readlines</span><span class="punc">()</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Total baris: <span class="fmt">{len(baris_list)}</span>"</span><span class="punc">)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">with open() as f:</span><span class="ann-desc">Context manager — file otomatis ditutup saat keluar dari blok <code>with</code>, bahkan kalau terjadi error. Ini cara yang direkomendasikan, lebih aman dari C.</span></div>
+    <div class="ann green"><span class="ann-code">"w", "r", "a"</span><span class="ann-desc">Mode sama seperti C: <code>w</code>=write (timpa), <code>r</code>=read, <code>a</code>=append. Tambah <code>b</code> untuk binary: <code>"rb"</code>, <code>"wb"</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">readlines()</span><span class="ann-desc">Baca semua baris sekaligus ke dalam list. Tiap elemen list adalah satu baris (termasuk <code>\n</code> di akhir).</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 17. ERROR HANDLING -->
+<div class="section" id="error" style="animation-delay:0.85s">
+  <div class="section-header"><div class="section-num">17</div><h2>Error Handling — "Tangani Error dengan Elegan"</h2></div>
+  <p class="desc">Di Python, error ditangani dengan blok <code>try/except</code>. Program tidak langsung crash saat error — kamu bisa tangkap errornya dan lakukan sesuatu.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">error.py</span></div>
+    <pre><span class="cmt"># try/except dasar</span>
+<span class="kw">try</span><span class="punc">:</span>
+    nilai <span class="op">=</span> <span class="fn">int</span><span class="punc">(</span><span class="fn">input</span><span class="punc">(</span><span class="str">"Masukkan angka: "</span><span class="punc">))</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Hasilnya: <span class="fmt">{100 / nilai}</span>"</span><span class="punc">)</span>
+<span class="kw">except</span> ValueError<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">"Input harus berupa angka!"</span><span class="punc">)</span>
+<span class="kw">except</span> ZeroDivisionError<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">"Tidak boleh membagi dengan nol!"</span><span class="punc">)</span>
+<span class="kw">except</span> Exception <span class="kw">as</span> e<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Error: <span class="fmt">{e}</span>"</span><span class="punc">)</span>       <span class="cmt"># tangkap semua error lain</span>
+<span class="kw">else</span><span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">"Tidak ada error!"</span><span class="punc">)</span>   <span class="cmt"># jalan kalau tidak ada error</span>
+<span class="kw">finally</span><span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">"Blok ini selalu jalan"</span><span class="punc">)</span>
+
+<span class="cmt"># Raise error sendiri</span>
+<span class="kw">def</span> <span class="fn">bagi</span><span class="punc">(</span>a<span class="punc">,</span> b<span class="punc">):</span>
+    <span class="kw">if</span> b <span class="op">==</span> <span class="num">0</span><span class="punc">:</span>
+        <span class="kw">raise</span> ValueError<span class="punc">(</span><span class="str">"Pembagi tidak boleh nol!"</span><span class="punc">)</span>
+    <span class="kw">return</span> a <span class="op">/</span> b</pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">try / except</span><span class="ann-desc">Blok <code>try</code> berisi kode yang mungkin error. Kalau error terjadi, lompat ke blok <code>except</code> yang sesuai.</span></div>
+    <div class="ann green"><span class="ann-code">except ValueError</span><span class="ann-desc">Tangkap jenis error spesifik. <code>ValueError</code> = nilai tidak valid (misal convert huruf ke int). <code>ZeroDivisionError</code> = bagi dengan nol.</span></div>
+    <div class="ann yellow"><span class="ann-code">finally</span><span class="ann-desc">Blok yang selalu dijalankan apapun yang terjadi — baik ada error maupun tidak. Berguna untuk cleanup seperti tutup file.</span></div>
+    <div class="ann orange"><span class="ann-code">raise</span><span class="ann-desc">Lempar error secara manual. Berguna untuk validasi di dalam fungsi — kalau input tidak valid, raise error yang jelas.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 18. LIST COMPREHENSION -->
+<div class="section" id="listcomp" style="animation-delay:0.9s">
+  <div class="section-header"><div class="section-num">18</div><h2>List Comprehension — "Buat List dalam Satu Baris"</h2></div>
+  <p class="desc">List comprehension adalah cara Python yang elegan untuk membuat list baru dari list lain dalam satu baris. Lebih ringkas dari loop biasa.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">listcomp.py</span></div>
+    <pre><span class="cmt"># Cara biasa vs list comprehension</span>
+angka <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span> <span class="num">2</span><span class="punc">,</span> <span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">,</span> <span class="num">5</span><span class="punc">]</span>
+
+<span class="cmt"># Cara biasa — 4 baris</span>
+kuadrat <span class="op">=</span> <span class="punc">[]</span>
+<span class="kw">for</span> x <span class="kw">in</span> angka<span class="punc">:</span>
+    kuadrat<span class="punc">.</span><span class="fn">append</span><span class="punc">(</span>x<span class="op">**</span><span class="num">2</span><span class="punc">)</span>
+
+<span class="cmt"># List comprehension — 1 baris, hasil sama</span>
+kuadrat <span class="op">=</span> <span class="punc">[</span>x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> angka<span class="punc">]</span>
+<span class="fn">print</span><span class="punc">(</span>kuadrat<span class="punc">)</span>    <span class="cmt"># [1, 4, 9, 16, 25]</span>
+
+<span class="cmt"># Dengan kondisi (filter)</span>
+genap <span class="op">=</span> <span class="punc">[</span>x <span class="kw">for</span> x <span class="kw">in</span> angka <span class="kw">if</span> x <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="punc">]</span>
+<span class="fn">print</span><span class="punc">(</span>genap<span class="punc">)</span>     <span class="cmt"># [2, 4]</span>
+
+<span class="cmt"># Transformasi string</span>
+kata  <span class="op">=</span> <span class="punc">[</span><span class="str">"halo"</span><span class="punc">,</span> <span class="str">"dunia"</span><span class="punc">,</span> <span class="str">"python"</span><span class="punc">]</span>
+besar <span class="op">=</span> <span class="punc">[</span>k<span class="punc">.</span><span class="fn">upper</span><span class="punc">()</span> <span class="kw">for</span> k <span class="kw">in</span> kata<span class="punc">]</span>
+<span class="fn">print</span><span class="punc">(</span>besar<span class="punc">)</span>     <span class="cmt"># ['HALO', 'DUNIA', 'PYTHON']</span>
+
+<span class="cmt"># Nested list comprehension — tabel 3x3</span>
+tabel <span class="op">=</span> <span class="punc">[[</span>i<span class="op">*</span>j <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span><span class="num">4</span><span class="punc">)]</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span><span class="num">4</span><span class="punc">)]</span>
+<span class="kw">for</span> baris <span class="kw">in</span> tabel<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span>baris<span class="punc">)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">[ekspresi for x in list]</span><span class="ann-desc">Format dasar list comprehension. Baca: "buat list berisi ekspresi, untuk setiap x dalam list".</span></div>
+    <div class="ann green"><span class="ann-code">[x for x in list if kondisi]</span><span class="ann-desc">Tambah filter — hanya ambil elemen yang memenuhi kondisi. Menggantikan loop + if + append dalam satu baris.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">[1, 4, 9, 16, 25]
+[2, 4]
+['HALO', 'DUNIA', 'PYTHON']
+[1, 2, 3]
+[2, 4, 6]
+[3, 6, 9]</div>
+</div>
+
+<hr class="divider">
+
+<!-- 19. OOP -->
+<div class="section" id="oop" style="animation-delay:0.95s">
+  <div class="section-header"><div class="section-num">19</div><h2>OOP — Class & Object</h2></div>
+  <p class="desc">Object-Oriented Programming (OOP) adalah cara mengorganisir kode dengan membuat "template" bernama class, lalu membuat objek dari template itu. Class seperti cetakan kue, objek adalah kuenya.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">oop.py</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Mahasiswa</span><span class="punc">:</span>
+
+    <span class="cmt"># Constructor — dipanggil saat objek dibuat</span>
+    <span class="kw">def</span> <span class="fn">__init__</span><span class="punc">(</span>self<span class="punc">,</span> nama<span class="punc">,</span> nim<span class="punc">,</span> ipk<span class="punc">):</span>
+        self<span class="punc">.</span>nama <span class="op">=</span> nama
+        self<span class="punc">.</span>nim  <span class="op">=</span> nim
+        self<span class="punc">.</span>ipk  <span class="op">=</span> ipk
+
+    <span class="cmt"># Method</span>
+    <span class="kw">def</span> <span class="fn">perkenalan</span><span class="punc">(</span>self<span class="punc">):</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"Nama: <span class="fmt">{self.nama}</span>, NIM: <span class="fmt">{self.nim}</span>"</span><span class="punc">)</span>
+
+    <span class="kw">def</span> <span class="fn">status</span><span class="punc">(</span>self<span class="punc">):</span>
+        <span class="kw">if</span> self<span class="punc">.</span>ipk <span class="op">&gt;=</span> <span class="num">3.5</span><span class="punc">:</span>
+            <span class="kw">return</span> <span class="str">"Cumlaude"</span>
+        <span class="kw">elif</span> self<span class="punc">.</span>ipk <span class="op">&gt;=</span> <span class="num">2.0</span><span class="punc">:</span>
+            <span class="kw">return</span> <span class="str">"Lulus"</span>
+        <span class="kw">return</span> <span class="str">"Tidak Lulus"</span>
+
+    <span class="cmt"># __str__ — tampilan saat di-print</span>
+    <span class="kw">def</span> <span class="fn">__str__</span><span class="punc">(</span>self<span class="punc">):</span>
+        <span class="kw">return</span> <span class="str">f"Mahasiswa(<span class="fmt">{self.nama}</span>, IPK: <span class="fmt">{self.ipk}</span>)"</span>
+
+<span class="cmt"># Buat objek</span>
+mhs1 <span class="op">=</span> <span class="cls">Mahasiswa</span><span class="punc">(</span><span class="str">"Budi"</span><span class="punc">,</span> <span class="str">"2024001"</span><span class="punc">,</span> <span class="num">3.8</span><span class="punc">)</span>
+mhs2 <span class="op">=</span> <span class="cls">Mahasiswa</span><span class="punc">(</span><span class="str">"Ani"</span><span class="punc">,</span>  <span class="str">"2024002"</span><span class="punc">,</span> <span class="num">1.9</span><span class="punc">)</span>
+
+mhs1<span class="punc">.</span><span class="fn">perkenalan</span><span class="punc">()</span>
+<span class="fn">print</span><span class="punc">(</span>mhs1<span class="punc">.</span><span class="fn">status</span><span class="punc">())</span>
+<span class="fn">print</span><span class="punc">(</span>mhs2<span class="punc">.</span><span class="fn">status</span><span class="punc">())</span>
+<span class="fn">print</span><span class="punc">(</span>mhs1<span class="punc">)</span>             <span class="cmt"># pakai __str__</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">class Mahasiswa:</span><span class="ann-desc">Definisi class — seperti struct di C tapi bisa punya fungsi (method) juga. Nama class biasanya PascalCase (huruf kapital tiap kata).</span></div>
+    <div class="ann green"><span class="ann-code">__init__(self, ...)</span><span class="ann-desc">Constructor — method khusus yang otomatis dipanggil saat objek dibuat. Biasanya dipakai untuk inisialisasi atribut.</span></div>
+    <div class="ann yellow"><span class="ann-code">self</span><span class="ann-desc">Referensi ke objek itu sendiri — wajib ada sebagai parameter pertama di setiap method. Mirip pointer <code>this</code> di bahasa lain.</span></div>
+    <div class="ann orange"><span class="ann-code">__str__</span><span class="ann-desc">Method khusus yang menentukan bagaimana objek ditampilkan saat di-<code>print()</code>. Nama dengan dua underscore dipanggil "dunder method".</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Nama: Budi, NIM: 2024001
+Cumlaude
+Tidak Lulus
+Mahasiswa(Budi, IPK: 3.8)</div>
+</div>
+
+<hr class="divider">
+
+<!-- 20. INHERITANCE -->
+<div class="section" id="inheritance" style="animation-delay:1.0s">
+  <div class="section-header"><div class="section-num">20</div><h2>Inheritance — "Turunan Class"</h2></div>
+  <p class="desc">Inheritance memungkinkan class baru mewarisi semua atribut dan method dari class lain. Class turunan bisa menambah atau mengubah method yang diwarisi.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">inheritance.py</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Orang</span><span class="punc">:</span>        <span class="cmt"># Parent class</span>
+    <span class="kw">def</span> <span class="fn">__init__</span><span class="punc">(</span>self<span class="punc">,</span> nama<span class="punc">,</span> umur<span class="punc">):</span>
+        self<span class="punc">.</span>nama <span class="op">=</span> nama
+        self<span class="punc">.</span>umur <span class="op">=</span> umur
+
+    <span class="kw">def</span> <span class="fn">sapa</span><span class="punc">(</span>self<span class="punc">):</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"Halo, saya <span class="fmt">{self.nama}</span>!"</span><span class="punc">)</span>
+
+<span class="kw">class</span> <span class="cls">Mahasiswa</span><span class="punc">(</span><span class="cls">Orang</span><span class="punc">):</span>  <span class="cmt"># Child class</span>
+    <span class="kw">def</span> <span class="fn">__init__</span><span class="punc">(</span>self<span class="punc">,</span> nama<span class="punc">,</span> umur<span class="punc">,</span> nim<span class="punc">):</span>
+        <span class="fn">super</span><span class="punc">().</span><span class="fn">__init__</span><span class="punc">(</span>nama<span class="punc">,</span> umur<span class="punc">)</span>  <span class="cmt"># panggil constructor parent</span>
+        self<span class="punc">.</span>nim <span class="op">=</span> nim
+
+    <span class="kw">def</span> <span class="fn">sapa</span><span class="punc">(</span>self<span class="punc">):</span>   <span class="cmt"># override method parent</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"Halo, saya <span class="fmt">{self.nama}</span>, NIM: <span class="fmt">{self.nim}</span>"</span><span class="punc">)</span>
+
+<span class="kw">class</span> <span class="cls">Dosen</span><span class="punc">(</span><span class="cls">Orang</span><span class="punc">):</span>
+    <span class="kw">def</span> <span class="fn">__init__</span><span class="punc">(</span>self<span class="punc">,</span> nama<span class="punc">,</span> umur<span class="punc">,</span> matkul<span class="punc">):</span>
+        <span class="fn">super</span><span class="punc">().</span><span class="fn">__init__</span><span class="punc">(</span>nama<span class="punc">,</span> umur<span class="punc">)</span>
+        self<span class="punc">.</span>matkul <span class="op">=</span> matkul
+
+    <span class="kw">def</span> <span class="fn">mengajar</span><span class="punc">(</span>self<span class="punc">):</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{self.nama}</span> mengajar <span class="fmt">{self.matkul}</span>"</span><span class="punc">)</span>
+
+mhs <span class="op">=</span> <span class="cls">Mahasiswa</span><span class="punc">(</span><span class="str">"Budi"</span><span class="punc">,</span> <span class="num">20</span><span class="punc">,</span> <span class="str">"2024001"</span><span class="punc">)</span>
+dsn <span class="op">=</span> <span class="cls">Dosen</span><span class="punc">(</span><span class="str">"Pak Andi"</span><span class="punc">,</span> <span class="num">40</span><span class="punc">,</span> <span class="str">"Pemrograman"</span><span class="punc">)</span>
+
+mhs<span class="punc">.</span><span class="fn">sapa</span><span class="punc">()</span>
+dsn<span class="punc">.</span><span class="fn">sapa</span><span class="punc">()</span>         <span class="cmt"># pakai method dari parent</span>
+dsn<span class="punc">.</span><span class="fn">mengajar</span><span class="punc">()</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">isinstance</span><span class="punc">(</span>mhs<span class="punc">,</span> <span class="cls">Orang</span><span class="punc">))</span>  <span class="cmt"># True</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">class Child(Parent):</span><span class="ann-desc">Tulis nama parent class di dalam kurung saat mendefinisikan child class. Child otomatis mewarisi semua method parent.</span></div>
+    <div class="ann green"><span class="ann-code">super().__init__()</span><span class="ann-desc">Panggil constructor parent dari dalam constructor child. Wajib kalau child punya constructor sendiri dan ingin tetap menginisialisasi atribut parent.</span></div>
+    <div class="ann yellow"><span class="ann-code">Override method</span><span class="ann-desc">Child bisa mendefinisikan ulang method yang sudah ada di parent — method child yang akan dipanggil, bukan milik parent.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Halo, saya Budi, NIM: 2024001
+Halo, saya Pak Andi!
+Pak Andi mengajar Pemrograman
+True</div>
+</div>
+
+<hr class="divider">
+
+<!-- 21. ITERATOR & GENERATOR -->
+<div class="section" id="iterator" style="animation-delay:1.05s">
+  <div class="section-header"><div class="section-num">21</div><h2>Iterator & Generator</h2></div>
+  <p class="desc">Iterator adalah objek yang bisa diiterasi satu per satu. Generator adalah cara mudah membuat iterator menggunakan kata kunci <code>yield</code> — menghasilkan nilai satu per satu tanpa menyimpan semua di memori.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">generator.py</span></div>
+    <pre><span class="cmt"># Generator function — pakai yield</span>
+<span class="kw">def</span> <span class="fn">hitung_mundur</span><span class="punc">(</span>n<span class="punc">):</span>
+    <span class="kw">while</span> n <span class="op">&gt;</span> <span class="num">0</span><span class="punc">:</span>
+        <span class="kw">yield</span> n         <span class="cmt"># hasilkan nilai, lalu pause</span>
+        n <span class="op">-=</span> <span class="num">1</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">hitung_mundur</span><span class="punc">(</span><span class="num">5</span><span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span>i<span class="punc">,</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>     <span class="cmt"># 5 4 3 2 1</span>
+
+<span class="cmt"># Generator untuk bilangan genap tak terbatas</span>
+<span class="kw">def</span> <span class="fn">genap_tanpa_batas</span><span class="punc">():</span>
+    n <span class="op">=</span> <span class="num">0</span>
+    <span class="kw">while</span> <span class="kw">True</span><span class="punc">:</span>
+        <span class="kw">yield</span> n
+        n <span class="op">+=</span> <span class="num">2</span>
+
+gen <span class="op">=</span> <span class="fn">genap_tanpa_batas</span><span class="punc">()</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">5</span><span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="fn">next</span><span class="punc">(</span>gen<span class="punc">),</span> end<span class="op">=</span><span class="str">" "</span><span class="punc">)</span>  <span class="cmt"># 0 2 4 6 8</span>
+
+<span class="cmt"># Generator expression — seperti list comp tapi hemat memori</span>
+kuadrat_gen <span class="op">=</span> <span class="punc">(</span>x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span><span class="punc">(</span><span class="num">10</span><span class="punc">))</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">sum</span><span class="punc">(</span>kuadrat_gen<span class="punc">))</span>     <span class="cmt"># 285</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">yield</span><span class="ann-desc">Seperti <code>return</code> tapi tidak mengakhiri fungsi — fungsi di-pause, nilai dikembalikan, lalu dilanjutkan lagi saat dipanggil berikutnya.</span></div>
+    <div class="ann green"><span class="ann-code">next(gen)</span><span class="ann-desc">Ambil nilai berikutnya dari generator secara manual. Loop <code>for</code> juga memanggil <code>next()</code> secara otomatis di balik layar.</span></div>
+    <div class="ann yellow"><span class="ann-code">(x**2 for x in ...)</span><span class="ann-desc">Generator expression — pakai kurung biasa bukan siku. Lebih hemat memori dari list comprehension karena tidak menyimpan semua nilai sekaligus.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 22. DECORATOR -->
+<div class="section" id="decorator" style="animation-delay:1.1s">
+  <div class="section-header"><div class="section-num">22</div><h2>Decorator — "Tambah Fitur ke Fungsi"</h2></div>
+  <p class="desc">Decorator adalah fungsi yang membungkus fungsi lain untuk menambah kemampuan tanpa mengubah kode fungsi aslinya. Digunakan dengan simbol <code>@</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">decorator.py</span></div>
+    <pre><span class="kw">import</span> <span class="inc">time</span>
+
+<span class="cmt"># Decorator pengukur waktu</span>
+<span class="kw">def</span> <span class="fn">timer</span><span class="punc">(</span>func<span class="punc">):</span>
+    <span class="kw">def</span> <span class="fn">wrapper</span><span class="punc">(</span><span class="op">*</span>args<span class="punc">,</span> <span class="op">**</span>kwargs<span class="punc">):</span>
+        mulai  <span class="op">=</span> time<span class="punc">.</span><span class="fn">time</span><span class="punc">()</span>
+        hasil  <span class="op">=</span> <span class="fn">func</span><span class="punc">(</span><span class="op">*</span>args<span class="punc">,</span> <span class="op">**</span>kwargs<span class="punc">)</span>
+        selesai <span class="op">=</span> time<span class="punc">.</span><span class="fn">time</span><span class="punc">()</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"Waktu: <span class="fmt">{selesai - mulai:.4f}</span> detik"</span><span class="punc">)</span>
+        <span class="kw">return</span> hasil
+    <span class="kw">return</span> wrapper
+
+<span class="cmt"># Decorator logger</span>
+<span class="kw">def</span> <span class="fn">log</span><span class="punc">(</span>func<span class="punc">):</span>
+    <span class="kw">def</span> <span class="fn">wrapper</span><span class="punc">(</span><span class="op">*</span>args<span class="punc">,</span> <span class="op">**</span>kwargs<span class="punc">):</span>
+        <span class="fn">print</span><span class="punc">(</span><span class="str">f"Memanggil: <span class="fmt">{func.__name__}</span>"</span><span class="punc">)</span>
+        <span class="kw">return</span> <span class="fn">func</span><span class="punc">(</span><span class="op">*</span>args<span class="punc">,</span> <span class="op">**</span>kwargs<span class="punc">)</span>
+    <span class="kw">return</span> wrapper
+
+<span class="cmt"># Pakai decorator dengan @</span>
+<span class="dec">@timer</span>
+<span class="dec">@log</span>
+<span class="kw">def</span> <span class="fn">hitung_total</span><span class="punc">(</span>n<span class="punc">):</span>
+    <span class="kw">return</span> <span class="fn">sum</span><span class="punc">(</span><span class="fn">range</span><span class="punc">(</span>n<span class="punc">))</span>
+
+hasil <span class="op">=</span> <span class="fn">hitung_total</span><span class="punc">(</span><span class="num">1000000</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="str">f"Hasil: <span class="fmt">{hasil}</span>"</span><span class="punc">)</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">def decorator(func):</span><span class="ann-desc">Decorator adalah fungsi yang menerima fungsi lain sebagai argumen, membungkusnya, dan mengembalikan fungsi baru yang sudah ditambah fitur.</span></div>
+    <div class="ann green"><span class="ann-code">@timer</span><span class="ann-desc">Cara pakai decorator — tulis <code>@nama_decorator</code> tepat di atas definisi fungsi. Ini singkatan dari <code>hitung_total = timer(hitung_total)</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">@timer @log</span><span class="ann-desc">Bisa pakai banyak decorator sekaligus — dijalankan dari bawah ke atas. Fungsi didekorasi <code>log</code> dulu, lalu hasilnya didekorasi <code>timer</code>.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 23. REGEX -->
+<div class="section" id="regex" style="animation-delay:1.15s">
+  <div class="section-header"><div class="section-num">23</div><h2>Regex — "Pencarian Teks dengan Pola"</h2></div>
+  <p class="desc">Regular expression (regex) adalah bahasa mini untuk mencari, mencocokkan, dan memanipulasi teks berdasarkan pola. Berguna untuk validasi email, nomor HP, dan sebagainya.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">regex.py</span></div>
+    <pre><span class="kw">import</span> <span class="inc">re</span>
+
+teks <span class="op">=</span> <span class="str">"Hubungi kami di info@email.com atau 081234567890"</span>
+
+<span class="cmt"># Cari pola</span>
+email_pola <span class="op">=</span> <span class="str">r"[\w.-]+@[\w.-]+\.\w+"</span>
+hp_pola    <span class="op">=</span> <span class="str">r"08\d{9,12}"</span>
+
+email <span class="op">=</span> re<span class="punc">.</span><span class="fn">search</span><span class="punc">(</span>email_pola<span class="punc">,</span> teks<span class="punc">)</span>
+hp    <span class="op">=</span> re<span class="punc">.</span><span class="fn">search</span><span class="punc">(</span>hp_pola<span class="punc">,</span> teks<span class="punc">)</span>
+
+<span class="kw">if</span> email<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Email: <span class="fmt">{email.group()}</span>"</span><span class="punc">)</span>
+<span class="kw">if</span> hp<span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"HP   : <span class="fmt">{hp.group()}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># findall — cari semua yang cocok</span>
+angka_semua <span class="op">=</span> re<span class="punc">.</span><span class="fn">findall</span><span class="punc">(</span><span class="str">r"\d+"</span><span class="punc">,</span> <span class="str">"Ada 3 kucing dan 5 anjing"</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span>angka_semua<span class="punc">)</span>       <span class="cmt"># ['3', '5']</span>
+
+<span class="cmt"># sub — ganti teks</span>
+bersih <span class="op">=</span> re<span class="punc">.</span><span class="fn">sub</span><span class="punc">(</span><span class="str">r"\d+"</span><span class="punc">,</span> <span class="str">"X"</span><span class="punc">,</span> <span class="str">"PIN: 1234, OTP: 5678"</span><span class="punc">)</span>
+<span class="fn">print</span><span class="punc">(</span>bersih<span class="punc">)</span>            <span class="cmt"># "PIN: X, OTP: X"</span>
+
+<span class="cmt"># Validasi format</span>
+<span class="kw">def</span> <span class="fn">valid_email</span><span class="punc">(</span>email<span class="punc">):</span>
+    pola <span class="op">=</span> <span class="str">r"^[\w.-]+@[\w.-]+\.[a-z]{2,}$"</span>
+    <span class="kw">return</span> <span class="fn">bool</span><span class="punc">(</span>re<span class="punc">.</span><span class="fn">match</span><span class="punc">(</span>pola<span class="punc">,</span> email<span class="punc">))</span>
+
+<span class="fn">print</span><span class="punc">(</span><span class="fn">valid_email</span><span class="punc">(</span><span class="str">"budi@mail.com"</span><span class="punc">))</span>    <span class="cmt"># True</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">valid_email</span><span class="punc">(</span><span class="str">"bukan-email"</span><span class="punc">))</span>     <span class="cmt"># False</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">re.search()</span><span class="ann-desc">Cari pola di mana saja dalam teks. Return objek match atau None. Pakai <code>.group()</code> untuk ambil teks yang cocok.</span></div>
+    <div class="ann green"><span class="ann-code">re.findall()</span><span class="ann-desc">Cari semua kemunculan pola — return list string. Lebih praktis dari <code>search()</code> kalau butuh semua hasil.</span></div>
+    <div class="ann yellow"><span class="ann-code">r"pola"</span><span class="ann-desc">Raw string (huruf r di depan) — backslash tidak dianggap escape character. Selalu pakai raw string untuk regex agar pola tidak salah baca.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Email: info@email.com
+HP   : 081234567890
+['3', '5']
+PIN: X, OTP: X
+True
+False</div>
+</div>
+
+<hr class="divider">
+
+<!-- 24. VENV & PIP -->
+<div class="section" id="venv" style="animation-delay:1.2s">
+  <div class="section-header"><div class="section-num">24</div><h2>Virtual Environment & pip</h2></div>
+  <p class="desc">pip adalah package manager Python — untuk install library pihak ketiga. Virtual environment (venv) adalah ruang terisolasi untuk setiap project agar dependency tidak bentrok.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">terminal (bukan .py)</span></div>
+    <pre><span class="cmt"># Install library</span>
+pip install requests
+pip install numpy pandas matplotlib
+
+<span class="cmt"># Cek yang terinstall</span>
+pip list
+pip show requests
+
+<span class="cmt"># Buat virtual environment</span>
+python -m venv namaenv
+
+<span class="cmt"># Aktifkan (Windows)</span>
+namaenv\Scripts\activate
+
+<span class="cmt"># Aktifkan (Mac/Linux)</span>
+source namaenv/bin/activate
+
+<span class="cmt"># Install di dalam venv</span>
+pip install requests
+
+<span class="cmt"># Simpan daftar dependency</span>
+pip freeze > requirements.txt
+
+<span class="cmt"># Install dari requirements.txt</span>
+pip install -r requirements.txt
+
+<span class="cmt"># Nonaktifkan venv</span>
+deactivate</pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">pip install</span><span class="ann-desc">Install library dari PyPI (Python Package Index) — ribuan library gratis tersedia. Ini yang membuat Python sangat powerful untuk data science, web, AI, dll.</span></div>
+    <div class="ann green"><span class="ann-code">venv</span><span class="ann-desc">Virtual environment — setiap project punya "kotak" dependency sendiri yang terpisah. Hindari konflik versi antar project.</span></div>
+    <div class="ann yellow"><span class="ann-code">requirements.txt</span><span class="ann-desc">File daftar semua dependency project. Standar wajib kalau mau share project — orang lain tinggal <code>pip install -r requirements.txt</code>.</span></div>
+  </div>
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.5-1.5 4.5-3 6H9c-1.5-1.5-3-3.5-3-6a6 6 0 0 1 6-6z"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    <span>Library populer yang sering dipakai: <code>requests</code> (HTTP), <code>numpy</code> (matematika), <code>pandas</code> (data), <code>matplotlib</code> (grafik), <code>flask</code> (web), <code>pillow</code> (gambar).</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- 25. TIPS & TRIK -->
+<div class="section" id="tips" style="animation-delay:1.25s">
+  <div class="section-header"><div class="section-num">25</div><h2>Tips & Trik Python — "Kode yang Lebih Pythonic"</h2></div>
+  <p class="desc">Kode "Pythonic" = kode yang ditulis dengan cara yang idiomatik dan elegan sesuai gaya Python. Ini kumpulan tips yang akan membuat kode kamu lebih ringkas dan profesional.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">tips.py</span></div>
+    <pre><span class="cmt"># 1. Multiple assignment</span>
+a<span class="punc">,</span> b<span class="punc">,</span> c <span class="op">=</span> <span class="num">1</span><span class="punc">,</span> <span class="num">2</span><span class="punc">,</span> <span class="num">3</span>
+x<span class="punc">,</span> y <span class="op">=</span> y<span class="punc">,</span> x        <span class="cmt"># swap tanpa variabel temp!</span>
+
+<span class="cmt"># 2. Walrus operator := (Python 3.8+)</span>
+data <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">]</span>
+<span class="kw">if</span> n <span class="op">:=</span> <span class="fn">len</span><span class="punc">(</span>data<span class="punc">)</span> <span class="op">&gt;</span> <span class="num">2</span><span class="punc">:</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"Data panjang: <span class="fmt">{n}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># 3. zip() — iterasi dua list bersamaan</span>
+nama  <span class="op">=</span> <span class="punc">[</span><span class="str">"Budi"</span><span class="punc">,</span> <span class="str">"Ani"</span><span class="punc">,</span> <span class="str">"Cinta"</span><span class="punc">]</span>
+nilai <span class="op">=</span> <span class="punc">[</span><span class="num">85</span><span class="punc">,</span> <span class="num">90</span><span class="punc">,</span> <span class="num">78</span><span class="punc">]</span>
+<span class="kw">for</span> n<span class="punc">,</span> v <span class="kw">in</span> <span class="fn">zip</span><span class="punc">(</span>nama<span class="punc">,</span> nilai<span class="punc">):</span>
+    <span class="fn">print</span><span class="punc">(</span><span class="str">f"<span class="fmt">{n}</span>: <span class="fmt">{v}</span>"</span><span class="punc">)</span>
+
+<span class="cmt"># 4. any() dan all()</span>
+nilai_list <span class="op">=</span> <span class="punc">[</span><span class="num">80</span><span class="punc">,</span> <span class="num">90</span><span class="punc">,</span> <span class="num">55</span><span class="punc">,</span> <span class="num">75</span><span class="punc">]</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">any</span><span class="punc">(</span>v <span class="op">&lt;</span> <span class="num">60</span> <span class="kw">for</span> v <span class="kw">in</span> nilai_list<span class="punc">))</span>  <span class="cmt"># True (ada yg < 60)</span>
+<span class="fn">print</span><span class="punc">(</span><span class="fn">all</span><span class="punc">(</span>v <span class="op">&gt;=</span> <span class="num">60</span> <span class="kw">for</span> v <span class="kw">in</span> nilai_list<span class="punc">))</span> <span class="cmt"># False (tidak semua >= 60)</span>
+
+<span class="cmt"># 5. Dictionary comprehension</span>
+mhs_dict <span class="op">=</span> <span class="punc">{</span>n<span class="punc">:</span> v <span class="kw">for</span> n<span class="punc">,</span> v <span class="kw">in</span> <span class="fn">zip</span><span class="punc">(</span>nama<span class="punc">,</span> nilai<span class="punc">)}</span>
+<span class="fn">print</span><span class="punc">(</span>mhs_dict<span class="punc">)</span>  <span class="cmt"># {'Budi':85, 'Ani':90, 'Cinta':78}</span>
+
+<span class="cmt"># 6. Unpacking dengan *</span>
+pertama<span class="punc">,</span> <span class="op">*</span>sisanya <span class="op">=</span> <span class="punc">[</span><span class="num">1</span><span class="punc">,</span><span class="num">2</span><span class="punc">,</span><span class="num">3</span><span class="punc">,</span><span class="num">4</span><span class="punc">,</span><span class="num">5</span><span class="punc">]</span>
+<span class="fn">print</span><span class="punc">(</span>pertama<span class="punc">)</span>  <span class="cmt"># 1</span>
+<span class="fn">print</span><span class="punc">(</span>sisanya<span class="punc">)</span>  <span class="cmt"># [2,3,4,5]</span>
+
+<span class="cmt"># 7. Conditional import</span>
+<span class="kw">try</span><span class="punc">:</span>
+    <span class="kw">import</span> <span class="inc">ujson</span> <span class="kw">as</span> json   <span class="cmt"># versi cepat kalau ada</span>
+<span class="kw">except</span> ImportError<span class="punc">:</span>
+    <span class="kw">import</span> <span class="inc">json</span>             <span class="cmt"># fallback ke bawaan</span></pre>
+  </div>
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">x, y = y, x</span><span class="ann-desc">Swap dua variabel tanpa variabel temp — Python evaluasi sisi kanan dulu sebelum assign. Di C butuh variabel temp tambahan.</span></div>
+    <div class="ann green"><span class="ann-code">zip()</span><span class="ann-desc">Gabungkan dua list dan iterasi bersamaan. Berhenti di list yang terpendek. Sangat berguna untuk menghindari indexing manual.</span></div>
+    <div class="ann yellow"><span class="ann-code">any() / all()</span><span class="ann-desc"><code>any()</code> = True kalau minimal satu elemen memenuhi kondisi. <code>all()</code> = True kalau semua elemen memenuhi kondisi.</span></div>
+    <div class="ann orange"><span class="ann-code">pertama, *sisanya</span><span class="ann-desc">Extended unpacking — <code>*</code> menangkap "sisa" elemen ke dalam list. Sangat berguna untuk pisahkan elemen pertama/terakhir dari list.</span></div>
+  </div>
+  <div class="output-label">Output</div>
+  <div class="output-box">Budi: 85
+Ani: 90
+Cinta: 78
+True
+False
+{'Budi': 85, 'Ani': 90, 'Cinta': 78}
+1
+[2, 3, 4, 5]</div>
+</div>
+
+</div><!-- end .content -->
+
+<footer>
+  Panduan Python untuk Pemula &middot; Dibuat khusus buat belajar pemrograman
+</footer>
+
+<script>
+  function bukaDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function tutupDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupDrawer(); });
+</script>
+
+</body>
+</html>
