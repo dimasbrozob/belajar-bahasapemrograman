@@ -428,6 +428,38 @@
   .lang-card.py-lang { --card-color: #4ade80; }
   .lang-card.py-lang::before { background: rgba(74,222,128,0.04); }
 
+  .lang-card.html-lang { --card-color: #fb923c; }
+  .lang-card.html-lang::before { background: rgba(251,146,60,0.04); }
+
+  .lang-card.css-lang { --card-color: #818cf8; }
+  .lang-card.css-lang::before { background: rgba(129,140,248,0.04); }
+
+  .lang-card.js-lang { --card-color: #fbbf24; }
+  .lang-card.js-lang::before { background: rgba(251,191,36,0.04); }
+
+  .lang-card.soon {
+    cursor: default;
+    opacity: 0.72;
+  }
+
+  .lang-card.soon:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border);
+  }
+
+  .badge-soon {
+    background: rgba(139,154,181,0.08);
+    color: var(--text3);
+    border: 1px solid var(--border);
+  }
+
+  .html-lang .badge-ready {
+    background: rgba(251,146,60,0.1);
+    color: var(--orange);
+    border-color: rgba(251,146,60,0.25);
+  }
+
   .card-icon {
     width: 48px;
     height: 48px;
@@ -450,6 +482,27 @@
     background: rgba(74,222,128,0.1);
     color: var(--green);
     border: 1px solid rgba(74,222,128,0.2);
+  }
+
+  .html-lang .card-icon {
+    background: rgba(251,146,60,0.1);
+    color: var(--orange);
+    border: 1px solid rgba(251,146,60,0.2);
+    font-size: 15px;
+  }
+
+  .css-lang .card-icon {
+    background: rgba(129,140,248,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(129,140,248,0.2);
+    font-size: 15px;
+  }
+
+  .js-lang .card-icon {
+    background: rgba(251,191,36,0.1);
+    color: var(--yellow);
+    border: 1px solid rgba(251,191,36,0.2);
+    font-size: 15px;
   }
 
   .card-info { flex: 1; }
@@ -720,6 +773,58 @@
         <div class="card-arrow">→</div>
       </div>
     </a>
+
+  </div>
+
+  <!-- DASAR WEB -->
+  <div class="section-title" style="margin-top:48px;">
+    <h2>Dasar Web</h2>
+  </div>
+
+  <div class="lang-grid">
+
+    <a class="lang-card html-lang" href="panduan-html.html">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+        <div class="card-icon">&lt;/&gt;</div>
+        <div class="card-badge badge-ready">✓ Tersedia</div>
+      </div>
+      <div class="card-info">
+        <div class="card-name">HTML</div>
+        <div class="card-desc">Kerangka halaman web — struktur, tag penting, form, tabel, dan semantic HTML. Fondasi sebelum CSS &amp; JavaScript.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">8 materi · Dasar web</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <div class="lang-card css-lang soon">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+        <div class="card-icon">#</div>
+        <div class="card-badge badge-soon">Segera</div>
+      </div>
+      <div class="card-info">
+        <div class="card-name">CSS</div>
+        <div class="card-desc">Styling halaman web — selector, box model, flexbox, grid, warna, font, dan animasi sederhana.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">Coming soon</span>
+      </div>
+    </div>
+
+    <div class="lang-card js-lang soon">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+        <div class="card-icon">JS</div>
+        <div class="card-badge badge-soon">Segera</div>
+      </div>
+      <div class="card-info">
+        <div class="card-name">JavaScript</div>
+        <div class="card-desc">Interaktivitas di browser — variabel, fungsi, DOM, event, dan fetch API buat halaman yang hidup.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">Coming soon</span>
+      </div>
+    </div>
 
   </div>
 
