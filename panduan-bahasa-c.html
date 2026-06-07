@@ -595,6 +595,9 @@
     <a class="drawer-item" href="#ternary" onclick="tutupDrawer()"><span class="drawer-num">23</span> Operator Ternary</a>
     <a class="drawer-item" href="#casting" onclick="tutupDrawer()"><span class="drawer-num">24</span> Type Casting</a>
     <a class="drawer-item" href="#rekursi" onclick="tutupDrawer()"><span class="drawer-num">25</span> Rekursi</a>
+    <a class="drawer-item" href="#string-lanjut" onclick="tutupDrawer()"><span class="drawer-num">26</span> Fungsi String Lanjutan</a>
+    <a class="drawer-item" href="#fgets" onclick="tutupDrawer()"><span class="drawer-num">27</span> fgets — Baca File Baris per Baris</a>
+    <a class="drawer-item" href="#manipulasi-file" onclick="tutupDrawer()"><span class="drawer-num">28</span> Manipulasi File (remove &amp; rename)</a>
   </div>
 </div>
 
@@ -2137,6 +2140,203 @@ IPK bulat   : 3</div>
   <div class="callout warn">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span>Rekursi keren tapi boros memori dibanding loop biasa. Untuk pemula, rekursi paling sering keluar di soal faktorial atau Fibonacci. Yang wajib dipahami: selalu ada <strong>base case</strong> sebagai titik berhenti!</span>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+<!-- ===== 26. FUNGSI STRING LANJUTAN ===== -->
+<div class="section" id="string-lanjut" style="animation-delay:1.3s">
+  <div class="section-header">
+    <div class="section-num">26</div>
+    <h2>Fungsi String Lanjutan — "strstr, strncmp, snprintf"</h2>
+  </div>
+  <p class="desc">Selain <code>strcpy</code> dan <code>strlen</code>, ada fungsi string lain di <code>&lt;string.h&gt;</code> yang sering dipakai saat bekerja dengan teks. Tiga yang paling berguna: mencari teks di dalam teks, membandingkan sebagian teks, dan memformat teks ke variabel.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <span class="code-label">string_lanjut.c</span>
+    </div>
+    <pre><span class="inc">#include &lt;stdio.h&gt;</span>
+<span class="inc">#include &lt;string.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punc">() {</span>
+    <span class="kw">char</span> kalimat<span class="punc">[] =</span> <span class="str">"NIM : 12345\nNama : Budi\n"</span><span class="punc">;</span>
+
+    <span class="cmt">// strstr — cari teks di dalam teks</span>
+    <span class="kw">char</span> <span class="op">*</span>ketemu <span class="op">=</span> <span class="fn">strstr</span><span class="punc">(</span>kalimat<span class="punc">,</span> <span class="str">"NIM"</span><span class="punc">);</span>
+    <span class="kw">if</span> <span class="punc">(</span>ketemu <span class="op">!=</span> <span class="kw">NULL</span><span class="punc">) {</span>
+        <span class="fn">printf</span><span class="punc">(</span><span class="str">"Teks 'NIM' ditemukan!\n"</span><span class="punc">);</span>
+    <span class="punc">}</span>
+
+    <span class="cmt">// strncmp — bandingkan N karakter pertama</span>
+    <span class="kw">char</span> baris<span class="punc">[] =</span> <span class="str">"----------\n"</span><span class="punc">;</span>
+    <span class="kw">if</span> <span class="punc">(</span><span class="fn">strncmp</span><span class="punc">(</span>baris<span class="punc">,</span> <span class="str">"----------"</span><span class="punc">,</span> <span class="num">10</span><span class="punc">) ==</span> <span class="num">0</span><span class="punc">) {</span>
+        <span class="fn">printf</span><span class="punc">(</span><span class="str">"Ini garis pemisah!\n"</span><span class="punc">);</span>
+    <span class="punc">}</span>
+
+    <span class="cmt">// snprintf — format teks ke variabel (seperti printf tapi ke string)</span>
+    <span class="kw">char</span> cariNIM<span class="punc">[</span><span class="num">30</span><span class="punc">];</span>
+    <span class="fn">snprintf</span><span class="punc">(</span>cariNIM<span class="punc">,</span> <span class="kw">sizeof</span><span class="punc">(</span>cariNIM<span class="punc">),</span> <span class="str">"NIM : <span class="fmt">%s</span>"</span><span class="punc">,</span> <span class="str">"12345"</span><span class="punc">);</span>
+    <span class="fn">printf</span><span class="punc">(</span><span class="str">"cariNIM = %s\n"</span><span class="punc">,</span> cariNIM<span class="punc">);</span>  <span class="cmt">// "NIM : 12345"</span>
+
+    <span class="kw">return</span> <span class="num">0</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">strstr(haystack, needle)</span><span class="ann-desc">Mencari string <code>needle</code> di dalam <code>haystack</code>. Kalau ketemu, mengembalikan pointer ke posisi pertama ditemukannya. Kalau tidak ketemu, mengembalikan <code>NULL</code>. Selalu cek hasilnya dengan <code>!= NULL</code> sebelum dipakai.</span></div>
+    <div class="ann green"><span class="ann-code">strncmp(a, b, n)</span><span class="ann-desc">Membandingkan <strong>n karakter pertama</strong> dari string a dan b. Hasilnya <code>0</code> kalau sama, bukan 0 kalau beda. Lebih aman dari <code>strcmp</code> karena kita batasi jumlah karakternya.</span></div>
+    <div class="ann yellow"><span class="ann-code">snprintf(dest, size, format, ...)</span><span class="ann-desc">Seperti <code>printf</code> tapi hasilnya disimpan ke variabel <code>dest</code>, bukan ditampilkan ke layar. Parameter <code>size</code> adalah ukuran maksimal variabel tujuan — penting untuk mencegah overflow.</span></div>
+  </div>
+
+  <div class="output-label">Output</div>
+  <div class="output-box">Teks 'NIM' ditemukan!
+Ini garis pemisah!
+cariNIM = NIM : 12345</div>
+
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Ketiga fungsi ini berguna banget saat bekerja dengan file teks. Contohnya: <code>strncmp</code> untuk deteksi garis pemisah, <code>strstr</code> untuk cari NIM di dalam blok teks, dan <code>snprintf</code> untuk bikin string pencarian secara dinamis.</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 27. FGETS — BACA FILE BARIS PER BARIS ===== -->
+<div class="section" id="fgets" style="animation-delay:1.35s">
+  <div class="section-header">
+    <div class="section-num">27</div>
+    <h2>fgets — "Baca File Baris per Baris"</h2>
+  </div>
+  <p class="desc"><code>fgets</code> dipakai untuk membaca satu baris dari file (atau dari keyboard). Berbeda dengan <code>fscanf</code> yang berhenti di spasi, <code>fgets</code> membaca seluruh baris sampai newline. Cocok untuk baca file teks baris per baris.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <span class="code-label">baca_file.c</span>
+    </div>
+    <pre><span class="inc">#include &lt;stdio.h&gt;</span>
+<span class="inc">#include &lt;string.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punc">() {</span>
+    <span class="kw">FILE</span> <span class="op">*</span>file <span class="op">=</span> <span class="fn">fopen</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"r"</span><span class="punc">);</span>
+    <span class="kw">if</span> <span class="punc">(</span>file <span class="op">==</span> <span class="kw">NULL</span><span class="punc">) {</span>
+        <span class="fn">printf</span><span class="punc">(</span><span class="str">"File tidak ditemukan!\n"</span><span class="punc">);</span>
+        <span class="kw">return</span> <span class="num">1</span><span class="punc">;</span>
+    <span class="punc">}</span>
+
+    <span class="kw">char</span> baris<span class="punc">[</span><span class="num">200</span><span class="punc">];</span>
+    <span class="kw">char</span> blok<span class="punc">[</span><span class="num">2000</span><span class="punc">];</span>
+    <span class="kw">int</span> nomorBlok <span class="op">=</span> <span class="num">0</span><span class="punc">;</span>
+    blok<span class="punc">[</span><span class="num">0</span><span class="punc">] =</span> <span class="str">'\0'</span><span class="punc">;</span>  <span class="cmt">// kosongkan string blok</span>
+
+    <span class="cmt">// Baca file baris per baris</span>
+    <span class="kw">while</span> <span class="punc">(</span><span class="fn">fgets</span><span class="punc">(</span>baris<span class="punc">,</span> <span class="kw">sizeof</span><span class="punc">(</span>baris<span class="punc">),</span> file<span class="punc">) !=</span> <span class="kw">NULL</span><span class="punc">) {</span>
+        <span class="fn">strcat</span><span class="punc">(</span>blok<span class="punc">,</span> baris<span class="punc">);</span>  <span class="cmt">// kumpulkan baris ke blok</span>
+
+        <span class="cmt">// Kalau ketemu garis pemisah, berarti 1 blok data selesai</span>
+        <span class="kw">if</span> <span class="punc">(</span><span class="fn">strncmp</span><span class="punc">(</span>baris<span class="punc">,</span> <span class="str">"----------"</span><span class="punc">,</span> <span class="num">10</span><span class="punc">) ==</span> <span class="num">0</span><span class="punc">) {</span>
+            nomorBlok<span class="op">++</span><span class="punc">;</span>
+            <span class="fn">printf</span><span class="punc">(</span><span class="str">"[Data <span class="fmt">%d</span>]\n<span class="fmt">%s</span>"</span><span class="punc">,</span> nomorBlok<span class="punc">,</span> blok<span class="punc">);</span>
+            blok<span class="punc">[</span><span class="num">0</span><span class="punc">] =</span> <span class="str">'\0'</span><span class="punc">;</span>  <span class="cmt">// reset blok untuk data berikutnya</span>
+        <span class="punc">}</span>
+    <span class="punc">}</span>
+
+    <span class="fn">fclose</span><span class="punc">(</span>file<span class="punc">);</span>
+    <span class="kw">return</span> <span class="num">0</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">fgets(baris, sizeof(baris), file)</span><span class="ann-desc">Baca satu baris dari <code>file</code>, simpan ke <code>baris</code>, maksimal <code>sizeof(baris)</code> karakter. Mengembalikan <code>NULL</code> kalau sudah sampai akhir file (EOF) — ini yang jadi kondisi berhenti di <code>while</code>.</span></div>
+    <div class="ann green"><span class="ann-code">strcat(blok, baris)</span><span class="ann-desc">Menggabungkan (menyambung) string <code>baris</code> ke ujung string <code>blok</code>. Dengan ini kita bisa kumpulkan baris-baris satu blok data menjadi satu string besar.</span></div>
+    <div class="ann yellow"><span class="ann-code">blok[0] = '\0'</span><span class="ann-desc">Cara "mengosongkan" string tanpa deklarasi ulang. Dengan set karakter pertama ke null terminator, <code>strcat</code> berikutnya akan menulis dari awal — efeknya sama seperti string kosong.</span></div>
+  </div>
+
+  <div class="output-label">Output (isi data.txt: 2 data mahasiswa)</div>
+  <div class="output-box">[Data 1]
+Nama : Budi
+NIM : 12345
+IPK : 3.75
+----------
+[Data 2]
+Nama : Ani
+NIM : 67890
+IPK : 3.50
+----------</div>
+
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Pola <strong>kumpulkan baris → cek pemisah → proses blok → reset</strong> ini adalah teknik standar untuk baca file yang isinya banyak "record" yang dipisahkan oleh baris khusus. Sering muncul di program data mahasiswa, buku tamu, dan sejenisnya.</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 28. MANIPULASI FILE (REMOVE & RENAME) ===== -->
+<div class="section" id="manipulasi-file" style="animation-delay:1.4s">
+  <div class="section-header">
+    <div class="section-num">28</div>
+    <h2>Manipulasi File — "remove &amp; rename"</h2>
+  </div>
+  <p class="desc">Selain baca dan tulis, ada dua fungsi penting dari <code>&lt;stdio.h&gt;</code> untuk memanipulasi file: <code>remove()</code> untuk menghapus file, dan <code>rename()</code> untuk mengganti nama (atau memindahkan) file. Dua fungsi ini jadi kunci teknik <strong>tulis ulang file</strong> — cara standar untuk "menghapus baris di tengah file" yang sebetulnya tidak bisa dilakukan secara langsung di C.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <span class="code-label">hapus_data.c</span>
+    </div>
+    <pre><span class="inc">#include &lt;stdio.h&gt;</span>
+<span class="inc">#include &lt;string.h&gt;</span>
+
+<span class="kw">void</span> <span class="fn">hapusBlokKe</span><span class="punc">(</span><span class="kw">int</span> targetNomor<span class="punc">) {</span>
+    <span class="kw">FILE</span> <span class="op">*</span>asli <span class="op">=</span> <span class="fn">fopen</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">,</span> <span class="str">"r"</span><span class="punc">);</span>
+    <span class="kw">FILE</span> <span class="op">*</span>temp <span class="op">=</span> <span class="fn">fopen</span><span class="punc">(</span><span class="str">"temp.txt"</span><span class="punc">,</span> <span class="str">"w"</span><span class="punc">);</span>
+
+    <span class="kw">char</span> baris<span class="punc">[</span><span class="num">200</span><span class="punc">];</span>
+    <span class="kw">char</span> blok<span class="punc">[</span><span class="num">2000</span><span class="punc">];</span>
+    <span class="kw">int</span> blokKe <span class="op">=</span> <span class="num">0</span><span class="punc">;</span>
+    blok<span class="punc">[</span><span class="num">0</span><span class="punc">] =</span> <span class="str">'\0'</span><span class="punc">;</span>
+
+    <span class="kw">while</span> <span class="punc">(</span><span class="fn">fgets</span><span class="punc">(</span>baris<span class="punc">,</span> <span class="kw">sizeof</span><span class="punc">(</span>baris<span class="punc">),</span> asli<span class="punc">) !=</span> <span class="kw">NULL</span><span class="punc">) {</span>
+        <span class="fn">strcat</span><span class="punc">(</span>blok<span class="punc">,</span> baris<span class="punc">);</span>
+
+        <span class="kw">if</span> <span class="punc">(</span><span class="fn">strncmp</span><span class="punc">(</span>baris<span class="punc">,</span> <span class="str">"----------"</span><span class="punc">,</span> <span class="num">10</span><span class="punc">) ==</span> <span class="num">0</span><span class="punc">) {</span>
+            blokKe<span class="op">++</span><span class="punc">;</span>
+            <span class="kw">if</span> <span class="punc">(</span>blokKe <span class="op">!=</span> targetNomor<span class="punc">) {</span>
+                <span class="fn">fputs</span><span class="punc">(</span>blok<span class="punc">,</span> temp<span class="punc">);</span>  <span class="cmt">// tulis ke temp, kecuali yang dihapus</span>
+            <span class="punc">}</span>
+            blok<span class="punc">[</span><span class="num">0</span><span class="punc">] =</span> <span class="str">'\0'</span><span class="punc">;</span>
+        <span class="punc">}</span>
+    <span class="punc">}</span>
+
+    <span class="fn">fclose</span><span class="punc">(</span>asli<span class="punc">);</span>
+    <span class="fn">fclose</span><span class="punc">(</span>temp<span class="punc">);</span>
+
+    <span class="cmt">// Ganti data.txt dengan temp.txt</span>
+    <span class="fn">remove</span><span class="punc">(</span><span class="str">"data.txt"</span><span class="punc">);</span>           <span class="cmt">// hapus file asli</span>
+    <span class="fn">rename</span><span class="punc">(</span><span class="str">"temp.txt"</span><span class="punc">,</span> <span class="str">"data.txt"</span><span class="punc">);</span>  <span class="cmt">// ganti nama temp → data</span>
+<span class="punc">}</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punc">() {</span>
+    <span class="fn">hapusBlokKe</span><span class="punc">(</span><span class="num">2</span><span class="punc">);</span>  <span class="cmt">// hapus data nomor 2</span>
+    <span class="fn">printf</span><span class="punc">(</span><span class="str">"Data nomor 2 berhasil dihapus.\n"</span><span class="punc">);</span>
+    <span class="kw">return</span> <span class="num">0</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">remove("data.txt")</span><span class="ann-desc">Menghapus file dari disk secara permanen. Mengembalikan <code>0</code> kalau berhasil, bukan 0 kalau gagal (misal file tidak ada). Ada di <code>&lt;stdio.h&gt;</code>, tidak perlu library tambahan.</span></div>
+    <div class="ann green"><span class="ann-code">rename("temp.txt", "data.txt")</span><span class="ann-desc">Mengganti nama file dari <code>temp.txt</code> menjadi <code>data.txt</code>. Di sini dipakai sebagai langkah terakhir: setelah file asli dihapus, file sementara "dinaikkan" jadi file utama.</span></div>
+    <div class="ann yellow"><span class="ann-code">Teknik tulis ulang file</span><span class="ann-desc">Karena C tidak bisa hapus baris di tengah file secara langsung, solusinya: buka file asli (r) + file temp (w) → salin semua kecuali yang dihapus → hapus asli → rename temp jadi asli. Ini teknik standar yang dipakai di hampir semua program C yang punya fitur hapus data.</span></div>
+  </div>
+
+  <div class="callout warn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>Urutan <code>remove</code> → <code>rename</code> <strong>tidak boleh terbalik!</strong> Kalau <code>rename</code> dulu sebelum <code>remove</code>, di beberapa sistem akan gagal karena nama <code>data.txt</code> masih ada. Selalu hapus file asli dulu, baru rename file temp.</span>
   </div>
 </div>
 

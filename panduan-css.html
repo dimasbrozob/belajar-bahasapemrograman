@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan CSS untuk Pemula</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBmMTExNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzgxOGNmOCI+e308L3RleHQ+PC9zdmc+">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b27; --bg3: #1e2535;
+    --border: #2a3347; --text: #e2e8f0; --text2: #8b9ab5; --text3: #4a5568;
+    --accent: #818cf8; --accent2: #38bdf8;
+    --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+    --pink: #f472b6; --orange: #fb923c; --blue: #38bdf8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',system-ui,sans-serif; line-height:1.75; letter-spacing:0.01em; -webkit-font-smoothing:antialiased; }
+
+  .navbar { position:sticky; top:0; z-index:50; background:rgba(15,17,23,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 40px; }
+  .navbar-inner { max-width:900px; margin:0 auto; height:56px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-btn { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; color:var(--text2); background:transparent; border:1px solid var(--border); border-radius:8px; padding:6px 13px; cursor:pointer; text-decoration:none; transition:all 0.2s; font-family:'Plus Jakarta Sans',sans-serif; }
+  .nav-btn:hover { color:var(--text); border-color:var(--text2); background:var(--bg2); }
+  .navbar-title { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:7px; }
+  .navbar-title::before { content:''; width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 7px var(--accent); }
+
+  .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+  .drawer-overlay.open { opacity:1; pointer-events:all; }
+  .drawer { position:fixed; top:0; left:0; bottom:0; width:300px; background:var(--bg2); border-right:1px solid var(--border); z-index:91; transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow:hidden; }
+  .drawer.open { transform:translateX(0); }
+  .drawer-header { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .drawer-header h3 { font-size:14px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .drawer-header h3 svg { color:var(--accent); }
+  .drawer-close { width:30px; height:30px; border-radius:7px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .drawer-close:hover { color:var(--text); border-color:var(--text2); }
+  .drawer-list { overflow-y:auto; flex:1; padding:10px 12px 20px; }
+  .drawer-list::-webkit-scrollbar { width:4px; }
+  .drawer-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+  .drawer-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; text-decoration:none; color:var(--text2); font-size:13px; transition:all 0.15s; cursor:pointer; }
+  .drawer-item:hover { background:var(--bg3); color:var(--text); }
+  .drawer-num { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); width:20px; flex-shrink:0; text-align:right; }
+
+  .hero { padding:64px 40px 56px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--border); }
+  .hero-badge { display:inline-block; background:rgba(129,140,248,0.1); color:var(--accent); border:1px solid rgba(129,140,248,0.25); padding:4px 14px; border-radius:99px; font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+  .hero h1 { font-size:clamp(32px,5vw,52px); font-weight:800; line-height:1.15; margin-bottom:16px; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { color:var(--text2); font-size:16px; max-width:560px; }
+
+  .content { max-width:900px; margin:0 auto; padding:0 40px 80px; }
+  .section { margin-top:64px; opacity:0; transform:translateY(20px); animation:fadeUp 0.5s forwards; }
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .section-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+  .section-num { background:var(--accent); color:#0f1117; font-weight:700; font-size:12px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section h2 { font-size:22px; font-weight:700; color:var(--text); }
+  .section > p, .desc { color:var(--text2); font-size:15px; margin-bottom:20px; line-height:1.8; }
+
+  .code-block { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:0; }
+  .code-header { background:var(--bg3); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .code-dots { display:flex; gap:6px; }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .dot-r { background:#f87171; } .dot-y { background:#fbbf24; } .dot-g { background:#4ade80; }
+  .code-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+  pre { padding:20px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.75; }
+
+  /* CSS syntax highlight tokens */
+  .sel { color:#f472b6; }
+  .prop { color:#818cf8; }
+  .val { color:#4ade80; }
+  .val2 { color:#fbbf24; }
+  .cmt { color:#4a5568; font-style:italic; }
+  .at { color:#fb923c; }
+  .punc { color:#8b9ab5; }
+  .tag { color:#f472b6; }
+  .attr { color:#fbbf24; }
+  .htval { color:#4ade80; }
+
+  .demo-wrap { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; align-items:stretch; }
+  .demo-wrap .code-block { min-height:100%; }
+  .preview-panel { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; min-height:120px; }
+  .preview-header { background:var(--bg3); padding:10px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; font-family:'JetBrains Mono',monospace; }
+  .preview-header::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); }
+  .preview-live { flex:1; padding:16px; overflow:auto; background:#fff; color:#334155; font-family:system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5; min-height:140px; }
+  .preview-live.tall { min-height:220px; }
+
+  .annotations { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .ann { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:10px 14px; font-size:13.5px; display:flex; gap:12px; align-items:flex-start; }
+  .ann.green { border-left-color:var(--green); }
+  .ann.yellow { border-left-color:var(--yellow); }
+  .ann.pink { border-left-color:var(--pink); }
+  .ann.blue { border-left-color:var(--blue); }
+  .ann-code { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--bg3); padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; color:var(--accent); }
+  .ann.green .ann-code { color:var(--green); }
+  .ann.yellow .ann-code { color:var(--yellow); }
+  .ann.pink .ann-code { color:var(--pink); }
+  .ann.blue .ann-code { color:var(--blue); }
+  .ann-desc { color:var(--text2); font-size:13.5px; }
+
+  .table-wrap { overflow-x:auto; margin:16px 0; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { background:var(--bg3); color:var(--accent); padding:10px 16px; text-align:left; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+  td { padding:10px 16px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+  td:first-child { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--yellow); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--bg2); }
+
+  .callout { background:rgba(129,140,248,0.06); border:1px solid rgba(129,140,248,0.2); border-radius:10px; padding:14px 18px; font-size:14px; color:var(--text2); margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+  .callout.warn { background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.2); }
+  .callout.warn svg { color:var(--yellow) !important; }
+  .callout svg { color:var(--accent); flex-shrink:0; margin-top:2px; }
+
+  .divider { border:none; border-top:1px solid var(--border); margin:48px 0 0; }
+  code { font-family:'JetBrains Mono',monospace; font-size:12.5px; background:var(--bg3); padding:2px 6px; border-radius:4px; color:var(--accent); }
+  footer { border-top:1px solid var(--border); padding:32px 40px; max-width:900px; margin:0 auto; text-align:center; color:var(--text3); font-size:13px; }
+
+  @media (max-width:768px) { .demo-wrap { grid-template-columns:1fr; } }
+  @media (max-width:600px) { .hero, .content { padding-left:20px; padding-right:20px; } .navbar { padding-left:20px; padding-right:20px; } .drawer { width:280px; } }
+</style>
+</head>
+<body>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="tutupDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </h3>
+    <button class="drawer-close" onclick="tutupDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-list">
+    <a class="drawer-item" href="#pengenalan" onclick="tutupDrawer()"><span class="drawer-num">01</span> Pengenalan &amp; Cara Pakai CSS</a>
+    <a class="drawer-item" href="#selector" onclick="tutupDrawer()"><span class="drawer-num">02</span> Selector</a>
+    <a class="drawer-item" href="#box-model" onclick="tutupDrawer()"><span class="drawer-num">03</span> Box Model</a>
+    <a class="drawer-item" href="#teks-warna" onclick="tutupDrawer()"><span class="drawer-num">04</span> Teks &amp; Warna</a>
+    <a class="drawer-item" href="#display" onclick="tutupDrawer()"><span class="drawer-num">05</span> Display &amp; Posisi</a>
+    <a class="drawer-item" href="#flexbox" onclick="tutupDrawer()"><span class="drawer-num">06</span> Flexbox</a>
+    <a class="drawer-item" href="#grid" onclick="tutupDrawer()"><span class="drawer-num">07</span> Grid</a>
+    <a class="drawer-item" href="#pseudo" onclick="tutupDrawer()"><span class="drawer-num">08</span> Pseudo-class &amp; Pseudo-element</a>
+    <a class="drawer-item" href="#variabel" onclick="tutupDrawer()"><span class="drawer-num">09</span> CSS Variable</a>
+    <a class="drawer-item" href="#transisi" onclick="tutupDrawer()"><span class="drawer-num">10</span> Transisi &amp; Animasi</a>
+    <a class="drawer-item" href="#responsive" onclick="tutupDrawer()"><span class="drawer-num">11</span> Responsive Design</a>
+    <a class="drawer-item" href="#tips" onclick="tutupDrawer()"><span class="drawer-num">12</span> Tips &amp; Trik</a>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="nav-btn" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Kembali
+    </a>
+    <div class="navbar-title">CSS</div>
+    <button class="nav-btn" onclick="bukaDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Panduan CSS</div>
+  <h1>Bikin Web Jadi<br><span>Kelihatan Keren</span></h1>
+  <p>CSS (Cascading Style Sheets) ngatur tampilan HTML — warna, ukuran, layout, animasi. Kalau HTML itu kerangka bangunan, CSS itu cat, furnitur, dan dekorasinya.</p>
+</div>
+
+<div class="content">
+
+<!-- ===== 1. PENGENALAN ===== -->
+<div class="section" id="pengenalan" style="animation-delay:0.05s">
+  <div class="section-header"><div class="section-num">1</div><h2>Pengenalan &amp; Cara Pakai CSS</h2></div>
+  <p class="desc">Ada tiga cara menulis CSS: langsung di elemen (inline), di dalam tag <code>&lt;style&gt;</code> (internal), atau di file terpisah yang dihubungkan lewat <code>&lt;link&gt;</code> (external). Cara terbaik untuk project sungguhan adalah external — CSS dan HTML dipisah.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">style.css</span></div>
+      <pre><span class="cmt">/* Ini komentar CSS */</span>
+
+<span class="cmt">/* Anatomi CSS: selector { properti: nilai; } */</span>
+<span class="sel">h1</span> <span class="punc">{</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val2">32px</span><span class="punc">;</span>
+  <span class="prop">font-weight</span><span class="punc">:</span> <span class="val">bold</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">p</span> <span class="punc">{</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">#475569</span><span class="punc">;</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val2">15px</span><span class="punc">;</span>
+  <span class="prop">line-height</span><span class="punc">:</span> <span class="val2">1.7</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live">
+        <h1 style="color:#818cf8;font-size:32px;font-weight:bold;margin:0 0 8px">Judul Halaman</h1>
+        <p style="color:#475569;font-size:15px;line-height:1.7;margin:0">Ini paragraf yang sudah di-style pakai CSS. Warnanya lebih soft dan jarak barisnya lebih nyaman dibaca.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">selector</span><span class="ann-desc">Bagian yang menentukan elemen mana yang kena style. Bisa nama tag (<code>h1</code>, <code>p</code>), class (<code>.tombol</code>), atau ID (<code>#header</code>).</span></div>
+    <div class="ann green"><span class="ann-code">property: value;</span><span class="ann-desc">Satu aturan style. Properti adalah apa yang diubah (warna, ukuran, dll), nilai adalah isinya. Jangan lupa titik koma di akhir setiap deklarasi!</span></div>
+    <div class="ann yellow"><span class="ann-code">&lt;link rel="stylesheet" href="style.css"&gt;</span><span class="ann-desc">Cara menghubungkan file CSS external ke HTML. Taruh di dalam <code>&lt;head&gt;</code>. Satu file CSS bisa dipakai oleh banyak halaman HTML.</span></div>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Cara</th><th>Contoh</th><th>Kapan Dipakai</th></tr></thead>
+    <tbody>
+      <tr><td>Inline</td><td><code>style="color:red"</code></td><td>Override darurat, jangan kebiasaan</td></tr>
+      <tr><td>Internal</td><td><code>&lt;style&gt;...&lt;/style&gt;</code></td><td>Halaman tunggal, belajar/eksperimen</td></tr>
+      <tr><td>External</td><td><code>&lt;link href="style.css"&gt;</code></td><td>Project sungguhan — selalu pakai ini</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 2. SELECTOR ===== -->
+<div class="section" id="selector" style="animation-delay:0.1s">
+  <div class="section-header"><div class="section-num">2</div><h2>Selector — "Pilih Elemen yang Mau Di-style"</h2></div>
+  <p class="desc">Selector menentukan elemen HTML mana yang kena aturan CSS. Ada banyak jenis selector — dari yang paling basic (nama tag) sampai yang spesifik (kombinasi class + state).</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">selector.css</span></div>
+    <pre><span class="cmt">/* 1. Tag selector — semua elemen p */</span>
+<span class="sel">p</span> <span class="punc">{</span> <span class="prop">color</span><span class="punc">:</span> <span class="val">#333</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* 2. Class selector — elemen dengan class="tombol" */</span>
+<span class="sel">.tombol</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">white</span><span class="punc">;</span>
+  <span class="prop">padding</span><span class="punc">:</span> <span class="val2">8px 16px</span><span class="punc">;</span>
+  <span class="prop">border-radius</span><span class="punc">:</span> <span class="val2">6px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* 3. ID selector — elemen dengan id="judul" */</span>
+<span class="sel">#judul</span> <span class="punc">{</span> <span class="prop">font-size</span><span class="punc">:</span> <span class="val2">28px</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* 4. Kombinasi — p di dalam .kartu */</span>
+<span class="sel">.kartu p</span> <span class="punc">{</span> <span class="prop">color</span><span class="punc">:</span> <span class="val">#555</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* 5. Multiple selector — h1 DAN h2 dapat style yang sama */</span>
+<span class="sel">h1, h2</span> <span class="punc">{</span> <span class="prop">font-family</span><span class="punc">:</span> <span class="val">sans-serif</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* 6. Universal selector — semua elemen */</span>
+<span class="sel">*</span> <span class="punc">{</span> <span class="prop">box-sizing</span><span class="punc">:</span> <span class="val">border-box</span><span class="punc">;</span> <span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">.class</span><span class="ann-desc">Pakai titik di depan. Satu class bisa dipakai di banyak elemen, dan satu elemen bisa punya banyak class: <code>class="tombol merah besar"</code>. Ini yang paling sering dipakai.</span></div>
+    <div class="ann green"><span class="ann-code">#id</span><span class="ann-desc">Pakai tanda pagar. ID harusnya unik — satu ID hanya ada satu di satu halaman. Lebih spesifik dari class, tapi lebih jarang dipakai untuk styling.</span></div>
+    <div class="ann yellow"><span class="ann-code">.kartu p</span><span class="ann-desc">Descendant selector: pilih semua <code>p</code> yang ada di dalam elemen ber-class <code>kartu</code>. Berguna untuk styling yang kontekstual tanpa tambah class baru.</span></div>
+  </div>
+
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span><strong>Specificity (Kekhususan):</strong> CSS punya aturan prioritas. Kalau dua rule bentrok, yang lebih spesifik menang. Urutannya: inline style &gt; ID &gt; class &gt; tag. Makanya inline style selalu override semuanya.</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 3. BOX MODEL ===== -->
+<div class="section" id="box-model" style="animation-delay:0.15s">
+  <div class="section-header"><div class="section-num">3</div><h2>Box Model — "Setiap Elemen itu Kotak"</h2></div>
+  <p class="desc">Di CSS, setiap elemen HTML adalah sebuah kotak dengan 4 lapisan: <strong>content</strong> (isi), <strong>padding</strong> (jarak dalam), <strong>border</strong> (garis tepi), dan <strong>margin</strong> (jarak luar). Pahami ini, dan lo bisa kontrol layout dengan tepat.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">box.css</span></div>
+      <pre><span class="sel">.kotak</span> <span class="punc">{</span>
+  <span class="cmt">/* Ukuran konten */</span>
+  <span class="prop">width</span><span class="punc">:</span> <span class="val2">200px</span><span class="punc">;</span>
+  <span class="prop">height</span><span class="punc">:</span> <span class="val2">80px</span><span class="punc">;</span>
+
+  <span class="cmt">/* Jarak dalam (konten ke border) */</span>
+  <span class="prop">padding</span><span class="punc">:</span> <span class="val2">16px 24px</span><span class="punc">;</span>
+
+  <span class="cmt">/* Garis tepi */</span>
+  <span class="prop">border</span><span class="punc">:</span> <span class="val2">2px</span> <span class="val">solid</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">border-radius</span><span class="punc">:</span> <span class="val2">8px</span><span class="punc">;</span>
+
+  <span class="cmt">/* Jarak luar (dari elemen lain) */</span>
+  <span class="prop">margin</span><span class="punc">:</span> <span class="val2">20px auto</span><span class="punc">;</span>
+
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#f0f0ff</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+        <div style="width:200px;padding:16px 24px;border:2px solid #818cf8;border-radius:8px;background:#f0f0ff;text-align:center;color:#334155;font-size:13px;">Ini isi konten</div>
+        <div style="font-size:11px;color:#94a3b8;text-align:center;line-height:1.6">↑ padding 16px atas-bawah<br>↔ padding 24px kiri-kanan<br>border 2px ungu<br>margin auto (tengah)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">padding: 16px 24px</span><span class="ann-desc">Shorthand: nilai pertama untuk atas-bawah, kedua untuk kiri-kanan. Bisa juga 4 nilai: <code>padding: atas kanan bawah kiri</code> (searah jarum jam).</span></div>
+    <div class="ann green"><span class="ann-code">margin: 20px auto</span><span class="ann-desc"><code>auto</code> untuk kiri-kanan membuat elemen block menjadi terpusat secara horizontal. Trik klasik untuk centering elemen yang punya width.</span></div>
+    <div class="ann yellow"><span class="ann-code">box-sizing: border-box</span><span class="ann-desc">Secara default, <code>width</code> hanya menghitung konten — padding dan border ditambahkan di luar. Pakai <code>box-sizing: border-box</code> agar padding dan border masuk ke dalam ukuran <code>width</code>. Hampir semua developer modern selalu set ini ke semua elemen (<code>* { box-sizing: border-box; }</code>).</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 4. TEKS & WARNA ===== -->
+<div class="section" id="teks-warna" style="animation-delay:0.2s">
+  <div class="section-header"><div class="section-num">4</div><h2>Teks &amp; Warna — "Yang Paling Sering Diutak-atik"</h2></div>
+  <p class="desc">Styling teks dan warna adalah hal pertama yang lo otak-atik di CSS. Propertinya banyak tapi yang penting cuma beberapa.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">teks.css</span></div>
+      <pre><span class="sel">.judul</span> <span class="punc">{</span>
+  <span class="prop">font-family</span><span class="punc">:</span> <span class="val">'Segoe UI', sans-serif</span><span class="punc">;</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val2">24px</span><span class="punc">;</span>
+  <span class="prop">font-weight</span><span class="punc">:</span> <span class="val2">700</span><span class="punc">;</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">#1e293b</span><span class="punc">;</span>
+  <span class="prop">letter-spacing</span><span class="punc">:</span> <span class="val2">-0.5px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">.teks-body</span> <span class="punc">{</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val2">15px</span><span class="punc">;</span>
+  <span class="prop">line-height</span><span class="punc">:</span> <span class="val2">1.7</span><span class="punc">;</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">#475569</span><span class="punc">;</span>
+  <span class="prop">text-align</span><span class="punc">:</span> <span class="val">justify</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">.highlight</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#fef9c3</span><span class="punc">;</span>     <span class="cmt">/* hex */</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">rgb(30, 41, 59)</span><span class="punc">;</span> <span class="cmt">/* rgb */</span>
+  <span class="prop">border-left</span><span class="punc">:</span> <span class="val2">4px</span> <span class="val">solid</span> <span class="val">rgba(251,191,36,0.8)</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-family:'Segoe UI',sans-serif;font-size:24px;font-weight:700;color:#1e293b;letter-spacing:-0.5px;">Judul Artikel</div>
+        <div style="font-size:15px;line-height:1.7;color:#475569;">Ini contoh teks body yang lebih nyaman dibaca karena line-height 1.7 dan warna yang tidak terlalu hitam.</div>
+        <div style="background:#fef9c3;color:#1e293b;border-left:4px solid rgba(251,191,36,0.8);padding:8px 12px;font-size:14px;">Ini teks dengan highlight kuning.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">font-weight: 700</span><span class="ann-desc">Tebal teks. Bisa angka 100–900 (100=tipis, 400=normal, 700=bold, 900=hitam) atau kata kunci <code>normal</code> / <code>bold</code>. Tidak semua font punya semua ketebalan.</span></div>
+    <div class="ann green"><span class="ann-code">line-height: 1.7</span><span class="ann-desc">Jarak antar baris. Tanpa satuan berarti dikali font-size — <code>1.7</code> artinya jarak baris = 1.7× ukuran font. Untuk teks artikel, 1.6–1.8 paling nyaman dibaca.</span></div>
+    <div class="ann yellow"><span class="ann-code">rgba(r, g, b, a)</span><span class="ann-desc">Seperti rgb tapi ada channel alpha (transparansi) 0–1. <code>rgba(0,0,0,0.5)</code> = hitam 50% transparan. Berguna untuk overlay, shadow, border semi-transparan.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 5. DISPLAY & POSISI ===== -->
+<div class="section" id="display" style="animation-delay:0.25s">
+  <div class="section-header"><div class="section-num">5</div><h2>Display &amp; Posisi — "Elemen Mau Ditaruh di Mana?"</h2></div>
+  <p class="desc">Properti <code>display</code> menentukan bagaimana elemen ditampilkan di halaman. Ini salah satu properti CSS yang paling penting untuk dipahami karena langsung mempengaruhi layout.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">display.css</span></div>
+    <pre><span class="cmt">/* block: ambil seluruh lebar, mulai baris baru */</span>
+<span class="sel">div, p, h1</span> <span class="punc">{</span> <span class="prop">display</span><span class="punc">:</span> <span class="val">block</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* inline: ikut alur teks, tidak bisa set width/height */</span>
+<span class="sel">span, a, strong</span> <span class="punc">{</span> <span class="prop">display</span><span class="punc">:</span> <span class="val">inline</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* inline-block: ikut alur teks, TAPI bisa set width/height */</span>
+<span class="sel">.badge</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">inline-block</span><span class="punc">;</span>
+  <span class="prop">padding</span><span class="punc">:</span> <span class="val2">4px 12px</span><span class="punc">;</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">border-radius</span><span class="punc">:</span> <span class="val2">99px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* none: sembunyikan elemen sepenuhnya */</span>
+<span class="sel">.tersembunyi</span> <span class="punc">{</span> <span class="prop">display</span><span class="punc">:</span> <span class="val">none</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* position: relative + absolute untuk tumpuk elemen */</span>
+<span class="sel">.parent</span> <span class="punc">{</span> <span class="prop">position</span><span class="punc">:</span> <span class="val">relative</span><span class="punc">;</span> <span class="punc">}</span>
+<span class="sel">.badge-pojok</span> <span class="punc">{</span>
+  <span class="prop">position</span><span class="punc">:</span> <span class="val">absolute</span><span class="punc">;</span>
+  <span class="prop">top</span><span class="punc">:</span> <span class="val2">8px</span><span class="punc">;</span>
+  <span class="prop">right</span><span class="punc">:</span> <span class="val2">8px</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">display: block</span><span class="ann-desc">Elemen mulai dari baris baru dan memenuhi seluruh lebar container. <code>div</code>, <code>p</code>, <code>h1</code>–<code>h6</code> defaultnya block. Bisa set <code>width</code> dan <code>height</code>.</span></div>
+    <div class="ann green"><span class="ann-code">display: inline-block</span><span class="ann-desc">Kombinasi inline (ikut alur teks, tidak mulai baris baru) tapi tetap bisa dikasih <code>width</code>, <code>height</code>, <code>padding</code>, dan <code>margin</code> atas-bawah. Cocok untuk tombol, badge, chip.</span></div>
+    <div class="ann yellow"><span class="ann-code">position: absolute</span><span class="ann-desc">Elemen dilepas dari alur normal dan diposisikan relatif terhadap ancestor terdekat yang punya <code>position: relative</code>. Kalau tidak ada, relatif ke halaman. Dipakai untuk tooltip, badge notifikasi, dropdown.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 6. FLEXBOX ===== -->
+<div class="section" id="flexbox" style="animation-delay:0.3s">
+  <div class="section-header"><div class="section-num">6</div><h2>Flexbox — "Layout Satu Arah yang Fleksibel"</h2></div>
+  <p class="desc">Flexbox adalah sistem layout CSS untuk mengatur elemen dalam satu arah — horizontal atau vertikal. Sangat powerful untuk navbar, card row, centering elemen, dan layout sederhana.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">flexbox.css</span></div>
+      <pre><span class="sel">.navbar</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">flex</span><span class="punc">;</span>
+  <span class="prop">justify-content</span><span class="punc">:</span> <span class="val">space-between</span><span class="punc">;</span>
+  <span class="prop">align-items</span><span class="punc">:</span> <span class="val">center</span><span class="punc">;</span>
+  <span class="prop">padding</span><span class="punc">:</span> <span class="val2">12px 24px</span><span class="punc">;</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#1e293b</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">.kartu-row</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">flex</span><span class="punc">;</span>
+  <span class="prop">gap</span><span class="punc">:</span> <span class="val2">16px</span><span class="punc">;</span>
+  <span class="prop">flex-wrap</span><span class="punc">:</span> <span class="val">wrap</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">.kartu</span> <span class="punc">{</span>
+  <span class="prop">flex</span><span class="punc">:</span> <span class="val2">1</span><span class="punc">;</span>        <span class="cmt">/* ambil ruang sama rata */</span>
+  <span class="prop">min-width</span><span class="punc">:</span> <span class="val2">200px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Centering sempurna */</span>
+<span class="sel">.tengah</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">flex</span><span class="punc">;</span>
+  <span class="prop">justify-content</span><span class="punc">:</span> <span class="val">center</span><span class="punc">;</span>
+  <span class="prop">align-items</span><span class="punc">:</span> <span class="val">center</span><span class="punc">;</span>
+  <span class="prop">height</span><span class="punc">:</span> <span class="val2">200px</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall" style="padding:0;display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1e293b;color:#f8fafc;font-size:13px;">
+          <strong>Logo</strong>
+          <div style="display:flex;gap:12px;font-size:12px;color:#94a3b8;"><span>Beranda</span><span>Tentang</span><span>Kontak</span></div>
+          <button style="background:#818cf8;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Login</button>
+        </div>
+        <div style="display:flex;gap:10px;padding:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:80px;background:#f0f0ff;border:1px solid #c7d2fe;border-radius:8px;padding:10px;font-size:12px;color:#334155;text-align:center;">Kartu 1</div>
+          <div style="flex:1;min-width:80px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;font-size:12px;color:#334155;text-align:center;">Kartu 2</div>
+          <div style="flex:1;min-width:80px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;font-size:12px;color:#334155;text-align:center;">Kartu 3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">justify-content</span><span class="ann-desc">Mengatur posisi elemen di <strong>sumbu utama</strong> (horizontal kalau row, vertikal kalau column). Nilai: <code>flex-start</code>, <code>flex-end</code>, <code>center</code>, <code>space-between</code>, <code>space-around</code>.</span></div>
+    <div class="ann green"><span class="ann-code">align-items</span><span class="ann-desc">Mengatur posisi elemen di <strong>sumbu silang</strong> (vertikal kalau row). <code>center</code> = elemen rata tengah secara vertikal. Ini solusi centering vertikal yang paling mudah.</span></div>
+    <div class="ann yellow"><span class="ann-code">flex: 1</span><span class="ann-desc">Elemen mengambil ruang yang tersedia secara proporsional. Kalau semua elemen punya <code>flex:1</code>, mereka berbagi ruang sama rata. Kalau satu punya <code>flex:2</code>, dia dapat 2× lebih lebar.</span></div>
+    <div class="ann pink"><span class="ann-code">gap</span><span class="ann-desc">Jarak antar elemen flex tanpa perlu margin manual. Lebih bersih dari <code>margin-right</code> karena tidak ada sisa di elemen terakhir.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 7. GRID ===== -->
+<div class="section" id="grid" style="animation-delay:0.35s">
+  <div class="section-header"><div class="section-num">7</div><h2>Grid — "Layout Dua Dimensi"</h2></div>
+  <p class="desc">Kalau Flexbox untuk satu arah, CSS Grid untuk dua arah sekaligus — baris dan kolom. Sempurna untuk layout halaman, galeri foto, dashboard.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">grid.css</span></div>
+      <pre><span class="cmt">/* Grid 3 kolom sama lebar */</span>
+<span class="sel">.galeri</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">grid</span><span class="punc">;</span>
+  <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val">repeat(3, 1fr)</span><span class="punc">;</span>
+  <span class="prop">gap</span><span class="punc">:</span> <span class="val2">16px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Layout sidebar + konten */</span>
+<span class="sel">.layout</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">grid</span><span class="punc">;</span>
+  <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val2">240px</span> <span class="val">1fr</span><span class="punc">;</span>
+  <span class="prop">gap</span><span class="punc">:</span> <span class="val2">24px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Auto-fill: otomatis sesuai lebar container */</span>
+<span class="sel">.kartu-grid</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">grid</span><span class="punc">;</span>
+  <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val">repeat(auto-fill, minmax(200px, 1fr))</span><span class="punc">;</span>
+  <span class="prop">gap</span><span class="punc">:</span> <span class="val2">16px</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall">
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Galeri 3 kolom:</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+          <div style="background:#f0f0ff;border:1px solid #c7d2fe;border-radius:6px;padding:12px;font-size:11px;color:#4338ca;text-align:center;">Foto 1</div>
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:12px;font-size:11px;color:#15803d;text-align:center;">Foto 2</div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:12px;font-size:11px;color:#c2410c;text-align:center;">Foto 3</div>
+          <div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:6px;padding:12px;font-size:11px;color:#7e22ce;text-align:center;">Foto 4</div>
+          <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:6px;padding:12px;font-size:11px;color:#be123c;text-align:center;">Foto 5</div>
+          <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:6px;padding:12px;font-size:11px;color:#0f766e;text-align:center;">Foto 6</div>
+        </div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px;">Sidebar + Konten:</div>
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;">
+          <div style="background:#1e293b;color:#94a3b8;border-radius:6px;padding:10px;font-size:11px;">Sidebar</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px;font-size:11px;color:#334155;">Area konten utama</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">repeat(3, 1fr)</span><span class="ann-desc"><code>repeat(n, ukuran)</code> = buat n kolom. <code>1fr</code> = satu "fraction" dari ruang yang tersedia. Jadi <code>repeat(3, 1fr)</code> = 3 kolom sama lebar.</span></div>
+    <div class="ann green"><span class="ann-code">240px 1fr</span><span class="ann-desc">Kolom pertama lebar tetap 240px (sidebar), kolom kedua ambil sisa ruang yang ada (konten). Pola klasik untuk layout dua kolom.</span></div>
+    <div class="ann yellow"><span class="ann-code">auto-fill + minmax</span><span class="ann-desc">Kolom dibuat otomatis sebanyak mungkin, masing-masing minimal 200px dan maksimal 1fr. Hasilnya responsive tanpa media query — di layar lebar dapat 4 kolom, di mobile jadi 1 kolom.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 8. PSEUDO ===== -->
+<div class="section" id="pseudo" style="animation-delay:0.4s">
+  <div class="section-header"><div class="section-num">8</div><h2>Pseudo-class &amp; Pseudo-element</h2></div>
+  <p class="desc">Pseudo-class memilih elemen berdasarkan <em>state</em> (kondisi) — seperti saat di-hover, diklik, atau anak pertama. Pseudo-element membuat/memilih bagian virtual dari elemen.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">pseudo.css</span></div>
+      <pre><span class="cmt">/* :hover — saat mouse di atas elemen */</span>
+<span class="sel">.tombol</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">transition</span><span class="punc">:</span> <span class="val">background 0.2s</span><span class="punc">;</span>
+<span class="punc">}</span>
+<span class="sel">.tombol:hover</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#6366f1</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* :nth-child — baris ganjil tabel */</span>
+<span class="sel">tr:nth-child(odd)</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#f8fafc</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* :first-child dan :last-child */</span>
+<span class="sel">li:first-child</span> <span class="punc">{</span> <span class="prop">font-weight</span><span class="punc">:</span> <span class="val">bold</span><span class="punc">;</span> <span class="punc">}</span>
+
+<span class="cmt">/* ::before dan ::after — konten virtual */</span>
+<span class="sel">.label::before</span> <span class="punc">{</span>
+  <span class="prop">content</span><span class="punc">:</span> <span class="val">"★ "</span><span class="punc">;</span>
+  <span class="prop">color</span><span class="punc">:</span> <span class="val">#fbbf24</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;gap:10px;">
+        <button style="background:#818cf8;color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:13px;cursor:pointer;" onmouseover="this.style.background='#6366f1'" onmouseout="this.style.background='#818cf8'">Hover tombol ini</button>
+        <table style="font-size:12px;width:100%;border-collapse:collapse;">
+          <tr style="background:#f8fafc;"><td style="padding:5px 8px;border:1px solid #e2e8f0;">Baris ganjil</td><td style="padding:5px 8px;border:1px solid #e2e8f0;">Data A</td></tr>
+          <tr><td style="padding:5px 8px;border:1px solid #e2e8f0;">Baris genap</td><td style="padding:5px 8px;border:1px solid #e2e8f0;">Data B</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:5px 8px;border:1px solid #e2e8f0;">Baris ganjil</td><td style="padding:5px 8px;border:1px solid #e2e8f0;">Data C</td></tr>
+        </table>
+        <div style="font-size:14px;color:#334155;"><span style="color:#fbbf24">★ </span>Ini teks dengan ::before bintang</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">:hover</span><span class="ann-desc">State saat kursor mouse ada di atas elemen. Sering dikombinasi dengan <code>transition</code> biar perubahan stylenya smooth, tidak langsung snap.</span></div>
+    <div class="ann green"><span class="ann-code">:nth-child(odd/even)</span><span class="ann-desc">Pilih elemen berdasarkan posisinya di parent. <code>odd</code>=ganjil, <code>even</code>=genap. Bisa juga pakai formula: <code>:nth-child(3n)</code> = setiap kelipatan 3.</span></div>
+    <div class="ann yellow"><span class="ann-code">::before / ::after</span><span class="ann-desc">Membuat elemen virtual sebelum/sesudah konten. Wajib ada properti <code>content</code> (boleh kosong: <code>content: ""</code>). Berguna untuk dekorasi, ikon, atau efek tanpa tambah HTML.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 9. CSS VARIABLE ===== -->
+<div class="section" id="variabel" style="animation-delay:0.45s">
+  <div class="section-header"><div class="section-num">9</div><h2>CSS Variable — "Simpan Nilai yang Sering Dipakai"</h2></div>
+  <p class="desc">CSS Variable (custom property) memungkinkan lo menyimpan nilai yang sering dipakai — warna tema, ukuran font, jarak — lalu memanggilnya di mana saja. Kalau mau ganti warna utama, cukup ubah di satu tempat.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">variabel.css</span></div>
+      <pre><span class="cmt">/* Deklarasi di :root = tersedia global */</span>
+<span class="sel">:root</span> <span class="punc">{</span>
+  <span class="prop">--warna-utama</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">--warna-bg</span><span class="punc">:</span> <span class="val">#f8fafc</span><span class="punc">;</span>
+  <span class="prop">--radius</span><span class="punc">:</span> <span class="val2">8px</span><span class="punc">;</span>
+  <span class="prop">--font-besar</span><span class="punc">:</span> <span class="val2">18px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Pakai dengan var() */</span>
+<span class="sel">.tombol</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">var(--warna-utama)</span><span class="punc">;</span>
+  <span class="prop">border-radius</span><span class="punc">:</span> <span class="val">var(--radius)</span><span class="punc">;</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val">var(--font-besar)</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="sel">.kartu</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">var(--warna-bg)</span><span class="punc">;</span>
+  <span class="prop">border-radius</span><span class="punc">:</span> <span class="val">var(--radius)</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;gap:10px;">
+        <button style="background:#818cf8;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;">Tombol</button>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;font-size:13px;color:#334155;">Kartu — pakai <code>--radius</code> dan <code>--warna-bg</code> yang sama.</div>
+        <div style="font-size:11px;color:#94a3b8;">Ganti --warna-utama di :root → tombol langsung ikut berubah.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">--nama-variabel</span><span class="ann-desc">Nama variabel CSS selalu diawali dua strip (<code>--</code>). Huruf besar-kecil berpengaruh: <code>--Warna</code> ≠ <code>--warna</code>. Konvensi umum pakai huruf kecil dengan strip.</span></div>
+    <div class="ann green"><span class="ann-code">var(--nama, fallback)</span><span class="ann-desc">Pakai variabel dengan <code>var()</code>. Bisa tambah fallback: <code>var(--warna-utama, blue)</code> artinya kalau variabel tidak ada, pakai biru. Berguna untuk library atau komponen yang bisa dikustomisasi.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 10. TRANSISI & ANIMASI ===== -->
+<div class="section" id="transisi" style="animation-delay:0.5s">
+  <div class="section-header"><div class="section-num">10</div><h2>Transisi &amp; Animasi — "Bikin Halaman Hidup"</h2></div>
+  <p class="desc"><code>transition</code> bikin perubahan style jadi smooth — misal hover yang tidak langsung snap. <code>animation</code> lebih powerful: bisa loop, bisa complex multi-step, tanpa perlu trigger dari user.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">animasi.css</span></div>
+      <pre><span class="cmt">/* Transisi: properti durasi easing */</span>
+<span class="sel">.tombol</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#818cf8</span><span class="punc">;</span>
+  <span class="prop">transform</span><span class="punc">:</span> <span class="val">scale(1)</span><span class="punc">;</span>
+  <span class="prop">transition</span><span class="punc">:</span> <span class="val">all 0.2s ease</span><span class="punc">;</span>
+<span class="punc">}</span>
+<span class="sel">.tombol:hover</span> <span class="punc">{</span>
+  <span class="prop">background</span><span class="punc">:</span> <span class="val">#6366f1</span><span class="punc">;</span>
+  <span class="prop">transform</span><span class="punc">:</span> <span class="val">scale(1.05)</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Animasi: definisi @keyframes */</span>
+<span class="at">@keyframes</span> <span class="val">fadeUp</span> <span class="punc">{</span>
+  <span class="val">from</span> <span class="punc">{</span>
+    <span class="prop">opacity</span><span class="punc">:</span> <span class="val2">0</span><span class="punc">;</span>
+    <span class="prop">transform</span><span class="punc">:</span> <span class="val">translateY(20px)</span><span class="punc">;</span>
+  <span class="punc">}</span>
+  <span class="val">to</span> <span class="punc">{</span>
+    <span class="prop">opacity</span><span class="punc">:</span> <span class="val2">1</span><span class="punc">;</span>
+    <span class="prop">transform</span><span class="punc">:</span> <span class="val">translateY(0)</span><span class="punc">;</span>
+  <span class="punc">}</span>
+<span class="punc">}</span>
+
+<span class="sel">.muncul</span> <span class="punc">{</span>
+  <span class="prop">animation</span><span class="punc">:</span> <span class="val">fadeUp 0.5s ease forwards</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;">
+        <button style="background:#818cf8;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.background='#6366f1';this.style.transform='scale(1.05)'" onmouseout="this.style.background='#818cf8';this.style.transform='scale(1)'">Hover — scale + warna</button>
+        <button onclick="this.closest('.preview-live').querySelector('.anim-demo').style.animation='none';setTimeout(()=>{this.closest('.preview-live').querySelector('.anim-demo').style.animation='fadeUpDemo 0.5s ease forwards'},10)" style="background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;">▶ Putar animasi fadeUp</button>
+        <style>.anim-demo{opacity:0;} @keyframes fadeUpDemo{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}</style>
+        <div class="anim-demo" style="background:#f0f0ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 16px;font-size:13px;color:#4338ca;width:100%;">Elemen muncul dari bawah ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">transition: all 0.2s ease</span><span class="ann-desc">Format: <code>properti durasi easing delay</code>. <code>all</code> berarti semua properti yang berubah ikut transisi. Easing: <code>ease</code> (default), <code>linear</code>, <code>ease-in</code>, <code>ease-out</code>, <code>ease-in-out</code>.</span></div>
+    <div class="ann green"><span class="ann-code">transform: scale / translateY</span><span class="ann-desc"><code>transform</code> tidak mempengaruhi layout — elemen lain tidak bergerak. Lebih performa daripada mengubah <code>width</code>/<code>margin</code> karena diproses di GPU.</span></div>
+    <div class="ann yellow"><span class="ann-code">@keyframes</span><span class="ann-desc">Definisi animasi multi-step. Bisa pakai <code>from/to</code> untuk 2 langkah, atau persentase: <code>0% { } 50% { } 100% { }</code> untuk animasi yang lebih kompleks.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 11. RESPONSIVE ===== -->
+<div class="section" id="responsive" style="animation-delay:0.55s">
+  <div class="section-header"><div class="section-num">11</div><h2>Responsive Design — "Tampilannya Rapi di Semua Layar"</h2></div>
+  <p class="desc">Responsive design artinya layout menyesuaikan diri dengan ukuran layar. Caranya: <strong>media query</strong> untuk override CSS di ukuran tertentu, plus unit relatif seperti <code>%</code>, <code>vw</code>, dan <code>clamp()</code>.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">responsive.css</span></div>
+    <pre><span class="cmt">/* Default: mobile first */</span>
+<span class="sel">.grid</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">grid</span><span class="punc">;</span>
+  <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val2">1fr</span><span class="punc">;</span>    <span class="cmt">/* mobile: 1 kolom */</span>
+  <span class="prop">gap</span><span class="punc">:</span> <span class="val2">16px</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Tablet ke atas */</span>
+<span class="at">@media</span> <span class="punc">(</span><span class="prop">min-width</span><span class="punc">:</span> <span class="val2">768px</span><span class="punc">) {</span>
+  <span class="sel">.grid</span> <span class="punc">{</span>
+    <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val">repeat(2, 1fr)</span><span class="punc">;</span>
+  <span class="punc">}</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Desktop */</span>
+<span class="at">@media</span> <span class="punc">(</span><span class="prop">min-width</span><span class="punc">:</span> <span class="val2">1024px</span><span class="punc">) {</span>
+  <span class="sel">.grid</span> <span class="punc">{</span>
+    <span class="prop">grid-template-columns</span><span class="punc">:</span> <span class="val">repeat(3, 1fr)</span><span class="punc">;</span>
+  <span class="punc">}</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* clamp(min, ideal, max) — font yang fluid */</span>
+<span class="sel">h1</span> <span class="punc">{</span>
+  <span class="prop">font-size</span><span class="punc">:</span> <span class="val">clamp(24px, 5vw, 52px)</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">@media (min-width: 768px)</span><span class="ann-desc">Aturan CSS di dalam blok ini hanya aktif kalau lebar layar ≥ 768px. Ini pendekatan <em>mobile-first</em> — tulis default untuk mobile dulu, override untuk layar lebih besar.</span></div>
+    <div class="ann green"><span class="ann-code">vw / vh</span><span class="ann-desc">Unit relatif terhadap viewport. <code>1vw</code> = 1% lebar layar, <code>1vh</code> = 1% tinggi layar. <code>100vh</code> = tinggi penuh layar — berguna untuk hero section atau full-screen layout.</span></div>
+    <div class="ann yellow"><span class="ann-code">clamp(min, ideal, max)</span><span class="ann-desc">Font/ukuran yang fleksibel: tidak kurang dari min, tidak lebih dari max, tapi ideally nilai tengah. <code>clamp(24px, 5vw, 52px)</code> = di mobile 24px, di desktop besar 52px, di tengah fleksibel.</span></div>
+  </div>
+
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Jangan lupa tag ini di <code>&lt;head&gt;</code>: <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>. Tanpa ini, media query tidak berfungsi di mobile!</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 12. TIPS ===== -->
+<div class="section" id="tips" style="animation-delay:0.6s">
+  <div class="section-header"><div class="section-num">12</div><h2>Tips &amp; Trik CSS</h2></div>
+  <p class="desc">Beberapa shortcut dan kebiasaan baik yang bikin CSS lo lebih rapi dan efisien.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">tips.css</span></div>
+    <pre><span class="cmt">/* Reset ringan — selalu taruh di awal */</span>
+<span class="sel">*, *::before, *::after</span> <span class="punc">{</span>
+  <span class="prop">margin</span><span class="punc">:</span> <span class="val2">0</span><span class="punc">;</span>
+  <span class="prop">padding</span><span class="punc">:</span> <span class="val2">0</span><span class="punc">;</span>
+  <span class="prop">box-sizing</span><span class="punc">:</span> <span class="val">border-box</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Centering sempurna dengan flex */</span>
+<span class="sel">.pusat</span> <span class="punc">{</span>
+  <span class="prop">display</span><span class="punc">:</span> <span class="val">flex</span><span class="punc">;</span>
+  <span class="prop">justify-content</span><span class="punc">:</span> <span class="val">center</span><span class="punc">;</span>
+  <span class="prop">align-items</span><span class="punc">:</span> <span class="val">center</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Teks tidak meluber */</span>
+<span class="sel">.teks-ellipsis</span> <span class="punc">{</span>
+  <span class="prop">white-space</span><span class="punc">:</span> <span class="val">nowrap</span><span class="punc">;</span>
+  <span class="prop">overflow</span><span class="punc">:</span> <span class="val">hidden</span><span class="punc">;</span>
+  <span class="prop">text-overflow</span><span class="punc">:</span> <span class="val">ellipsis</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Gambar responsif */</span>
+<span class="sel">img</span> <span class="punc">{</span>
+  <span class="prop">max-width</span><span class="punc">:</span> <span class="val2">100%</span><span class="punc">;</span>
+  <span class="prop">height</span><span class="punc">:</span> <span class="val">auto</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">/* Smooth scroll bawaan */</span>
+<span class="sel">html</span> <span class="punc">{</span>
+  <span class="prop">scroll-behavior</span><span class="punc">:</span> <span class="val">smooth</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Trik</th><th>Fungsi</th></tr></thead>
+    <tbody>
+      <tr><td>outline: none</td><td>Hilangkan outline default browser (hati-hati aksesibilitas!)</td></tr>
+      <tr><td>cursor: pointer</td><td>Ubah kursor jadi tangan — kasih ke elemen yang bisa diklik</td></tr>
+      <tr><td>user-select: none</td><td>Cegah teks bisa diseleksi — berguna untuk tombol/label</td></tr>
+      <tr><td>overflow: hidden</td><td>Sembunyikan konten yang meluber dari container</td></tr>
+      <tr><td>z-index</td><td>Atur tumpukan elemen — yang lebih besar di depan</td></tr>
+      <tr><td>opacity: 0.5</td><td>Transparansi elemen 0 (invisible) sampai 1 (full)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Pakai DevTools browser (F12 → tab Elements → Styles) untuk eksperimen CSS langsung di browser. Lo bisa edit nilai properti real-time tanpa ubah file — super berguna buat debugging layout.</span>
+  </div>
+</div>
+
+</div><!-- end .content -->
+
+<footer>
+  Panduan CSS untuk Pemula &middot; Lanjut ke JavaScript setelah ini
+</footer>
+
+<script>
+  function bukaDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function tutupDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupDrawer(); });
+</script>
+
+</body>
+</html>

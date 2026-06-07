@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan JavaScript untuk Pemula</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBmMTExNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZiYmYyNCI+SlM8L3RleHQ+PC9zdmc+">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b27; --bg3: #1e2535;
+    --border: #2a3347; --text: #e2e8f0; --text2: #8b9ab5; --text3: #4a5568;
+    --accent: #fbbf24; --accent2: #818cf8;
+    --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+    --pink: #f472b6; --orange: #fb923c; --blue: #38bdf8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',system-ui,sans-serif; line-height:1.75; letter-spacing:0.01em; -webkit-font-smoothing:antialiased; }
+
+  .navbar { position:sticky; top:0; z-index:50; background:rgba(15,17,23,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 40px; }
+  .navbar-inner { max-width:900px; margin:0 auto; height:56px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-btn { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; color:var(--text2); background:transparent; border:1px solid var(--border); border-radius:8px; padding:6px 13px; cursor:pointer; text-decoration:none; transition:all 0.2s; font-family:'Plus Jakarta Sans',sans-serif; }
+  .nav-btn:hover { color:var(--text); border-color:var(--text2); background:var(--bg2); }
+  .navbar-title { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:7px; }
+  .navbar-title::before { content:''; width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 7px var(--accent); }
+
+  .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+  .drawer-overlay.open { opacity:1; pointer-events:all; }
+  .drawer { position:fixed; top:0; left:0; bottom:0; width:300px; background:var(--bg2); border-right:1px solid var(--border); z-index:91; transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow:hidden; }
+  .drawer.open { transform:translateX(0); }
+  .drawer-header { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .drawer-header h3 { font-size:14px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .drawer-header h3 svg { color:var(--accent); }
+  .drawer-close { width:30px; height:30px; border-radius:7px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .drawer-close:hover { color:var(--text); border-color:var(--text2); }
+  .drawer-list { overflow-y:auto; flex:1; padding:10px 12px 20px; }
+  .drawer-list::-webkit-scrollbar { width:4px; }
+  .drawer-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+  .drawer-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; text-decoration:none; color:var(--text2); font-size:13px; transition:all 0.15s; cursor:pointer; }
+  .drawer-item:hover { background:var(--bg3); color:var(--text); }
+  .drawer-num { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); width:20px; flex-shrink:0; text-align:right; }
+
+  .hero { padding:64px 40px 56px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--border); }
+  .hero-badge { display:inline-block; background:rgba(251,191,36,0.1); color:var(--accent); border:1px solid rgba(251,191,36,0.25); padding:4px 14px; border-radius:99px; font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+  .hero h1 { font-size:clamp(32px,5vw,52px); font-weight:800; line-height:1.15; margin-bottom:16px; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { color:var(--text2); font-size:16px; max-width:560px; }
+
+  .content { max-width:900px; margin:0 auto; padding:0 40px 80px; }
+  .section { margin-top:64px; opacity:0; transform:translateY(20px); animation:fadeUp 0.5s forwards; }
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .section-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+  .section-num { background:var(--accent); color:#0f1117; font-weight:700; font-size:12px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section h2 { font-size:22px; font-weight:700; color:var(--text); }
+  .section > p, .desc { color:var(--text2); font-size:15px; margin-bottom:20px; line-height:1.8; }
+
+  .code-block { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:0; }
+  .code-header { background:var(--bg3); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .code-dots { display:flex; gap:6px; }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .dot-r { background:#f87171; } .dot-y { background:#fbbf24; } .dot-g { background:#4ade80; }
+  .code-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+  pre { padding:20px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.75; }
+
+  /* JS syntax tokens */
+  .kw  { color:#818cf8; }
+  .fn  { color:#38bdf8; }
+  .str { color:#4ade80; }
+  .num { color:#fb923c; }
+  .cmt { color:#4a5568; font-style:italic; }
+  .punc { color:#8b9ab5; }
+  .op  { color:#f472b6; }
+  .bool { color:#f87171; }
+  .met { color:#fbbf24; }
+
+  .demo-wrap { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; align-items:stretch; }
+  .demo-wrap .code-block { min-height:100%; }
+  .preview-panel { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; min-height:120px; }
+  .preview-header { background:var(--bg3); padding:10px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; font-family:'JetBrains Mono',monospace; }
+  .preview-header::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); }
+  .preview-live { flex:1; padding:16px; overflow:auto; background:#fff; color:#334155; font-family:system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5; min-height:140px; }
+  .preview-live.tall { min-height:220px; }
+  .preview-live button { padding:7px 14px; border-radius:6px; border:none; font-weight:600; cursor:pointer; font-family:inherit; font-size:13px; }
+  .preview-live input { padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font:inherit; color:#0f172a; }
+  .preview-live .output { background:#f1f5f9; border-radius:6px; padding:8px 12px; font-family:monospace; font-size:13px; margin-top:8px; min-height:32px; color:#0f172a; }
+
+  .annotations { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .ann { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:10px 14px; font-size:13.5px; display:flex; gap:12px; align-items:flex-start; }
+  .ann.green { border-left-color:var(--green); }
+  .ann.yellow { border-left-color:var(--yellow); }
+  .ann.pink { border-left-color:var(--pink); }
+  .ann.blue { border-left-color:var(--blue); }
+  .ann-code { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--bg3); padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; color:var(--accent); }
+  .ann.green .ann-code { color:var(--green); }
+  .ann.yellow .ann-code { color:var(--yellow); }
+  .ann.pink .ann-code { color:var(--pink); }
+  .ann.blue .ann-code { color:var(--blue); }
+  .ann-desc { color:var(--text2); font-size:13.5px; }
+
+  .table-wrap { overflow-x:auto; margin:16px 0; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { background:var(--bg3); color:var(--accent); padding:10px 16px; text-align:left; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+  td { padding:10px 16px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+  td:first-child { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--yellow); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--bg2); }
+
+  .callout { background:rgba(251,191,36,0.06); border:1px solid rgba(251,191,36,0.2); border-radius:10px; padding:14px 18px; font-size:14px; color:var(--text2); margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+  .callout.warn { background:rgba(248,113,113,0.06); border-color:rgba(248,113,113,0.2); }
+  .callout.warn svg { color:var(--red) !important; }
+  .callout svg { color:var(--accent); flex-shrink:0; margin-top:2px; }
+
+  .output-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin:16px 0 6px; }
+  .output-box { background:#0d1117; border:1px solid var(--border); border-radius:10px; padding:14px 18px; font-family:'JetBrains Mono',monospace; font-size:13px; color:#4ade80; line-height:1.75; }
+
+  .divider { border:none; border-top:1px solid var(--border); margin:48px 0 0; }
+  code { font-family:'JetBrains Mono',monospace; font-size:12.5px; background:var(--bg3); padding:2px 6px; border-radius:4px; color:var(--accent); }
+  footer { border-top:1px solid var(--border); padding:32px 40px; max-width:900px; margin:0 auto; text-align:center; color:var(--text3); font-size:13px; }
+
+  @media (max-width:768px) { .demo-wrap { grid-template-columns:1fr; } }
+  @media (max-width:600px) { .hero, .content { padding-left:20px; padding-right:20px; } .navbar { padding-left:20px; padding-right:20px; } .drawer { width:280px; } }
+</style>
+</head>
+<body>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="tutupDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </h3>
+    <button class="drawer-close" onclick="tutupDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-list">
+    <a class="drawer-item" href="#pengenalan" onclick="tutupDrawer()"><span class="drawer-num">01</span> Pengenalan JavaScript</a>
+    <a class="drawer-item" href="#variabel" onclick="tutupDrawer()"><span class="drawer-num">02</span> Variabel &amp; Tipe Data</a>
+    <a class="drawer-item" href="#operator" onclick="tutupDrawer()"><span class="drawer-num">03</span> Operator</a>
+    <a class="drawer-item" href="#kondisi" onclick="tutupDrawer()"><span class="drawer-num">04</span> if / else &amp; switch</a>
+    <a class="drawer-item" href="#loop" onclick="tutupDrawer()"><span class="drawer-num">05</span> Loop</a>
+    <a class="drawer-item" href="#fungsi" onclick="tutupDrawer()"><span class="drawer-num">06</span> Fungsi</a>
+    <a class="drawer-item" href="#array" onclick="tutupDrawer()"><span class="drawer-num">07</span> Array</a>
+    <a class="drawer-item" href="#objek" onclick="tutupDrawer()"><span class="drawer-num">08</span> Object</a>
+    <a class="drawer-item" href="#dom" onclick="tutupDrawer()"><span class="drawer-num">09</span> DOM — Manipulasi HTML</a>
+    <a class="drawer-item" href="#event" onclick="tutupDrawer()"><span class="drawer-num">10</span> Event</a>
+    <a class="drawer-item" href="#fetch" onclick="tutupDrawer()"><span class="drawer-num">11</span> Fetch API</a>
+    <a class="drawer-item" href="#tips" onclick="tutupDrawer()"><span class="drawer-num">12</span> Tips &amp; Trik</a>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="nav-btn" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Kembali
+    </a>
+    <div class="navbar-title">JavaScript</div>
+    <button class="nav-btn" onclick="bukaDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/></svg>
+      Daftar Isi
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Panduan JavaScript</div>
+  <h1>Bikin Web Jadi<br><span>Interaktif &amp; Hidup</span></h1>
+  <p>JavaScript adalah satu-satunya bahasa pemrograman yang langsung dimengerti browser. Kalau HTML itu struktur dan CSS itu tampilan, JS itu yang bikin tombol bereaksi, data berubah, dan halaman bergerak.</p>
+</div>
+
+<div class="content">
+
+<!-- ===== 1. PENGENALAN ===== -->
+<div class="section" id="pengenalan" style="animation-delay:0.05s">
+  <div class="section-header"><div class="section-num">1</div><h2>Pengenalan JavaScript</h2></div>
+  <p class="desc">JavaScript dijalankan langsung di browser — tidak perlu compile, tidak perlu install. Cukup tulis di tag <code>&lt;script&gt;</code> atau file <code>.js</code> terpisah, langsung jalan. Buka DevTools (F12) → Console untuk eksperimen langsung.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">script.js</span></div>
+      <pre><span class="cmt">// Ini komentar satu baris</span>
+
+<span class="cmt">/* Ini komentar
+   multi baris */</span>
+
+<span class="cmt">// Tampilkan di console browser</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Halo dari JavaScript!"</span><span class="punc">);</span>
+
+<span class="cmt">// Tampilkan popup</span>
+<span class="fn">alert</span><span class="punc">(</span><span class="str">"Selamat datang!"</span><span class="punc">);</span>
+
+<span class="cmt">// Tanya user</span>
+<span class="kw">let</span> nama <span class="op">=</span> <span class="fn">prompt</span><span class="punc">(</span><span class="str">"Siapa namamu?"</span><span class="punc">);</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Halo, "</span> <span class="op">+</span> nama<span class="punc">);</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live" style="display:flex;flex-direction:column;gap:10px;">
+        <button style="background:#fbbf24;color:#0f1117;padding:8px 16px;border-radius:7px;font-weight:700;border:none;cursor:pointer;font-size:13px;" onclick="this.nextElementSibling.textContent='console.log → \"Halo dari JavaScript!\"'">▶ Jalankan console.log</button>
+        <div class="output" style="background:#f1f5f9;border-radius:6px;padding:8px 12px;font-family:monospace;font-size:13px;color:#475569;min-height:36px;">Klik tombol untuk lihat output</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">💡 Buka F12 → Console di browser lo untuk lihat output aslinya</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">console.log()</span><span class="ann-desc">Tool debugging paling penting. Cetak apapun ke console browser — string, angka, array, object. Paling sering dipakai saat belajar dan debug kode.</span></div>
+    <div class="ann green"><span class="ann-code">&lt;script src="script.js"&gt;</span><span class="ann-desc">Cara menghubungkan file JS external. Taruh di akhir <code>&lt;body&gt;</code> (sebelum <code>&lt;/body&gt;</code>) biar HTML-nya selesai dimuat dulu sebelum JS dijalankan.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 2. VARIABEL & TIPE DATA ===== -->
+<div class="section" id="variabel" style="animation-delay:0.1s">
+  <div class="section-header"><div class="section-num">2</div><h2>Variabel &amp; Tipe Data</h2></div>
+  <p class="desc">Di JavaScript modern, pakai <code>let</code> (bisa diubah) dan <code>const</code> (tidak bisa diubah). Hindari <code>var</code> yang lama karena punya perilaku aneh dengan scope.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">variabel.js</span></div>
+    <pre><span class="cmt">// let — bisa diubah nilainya</span>
+<span class="kw">let</span> umur <span class="op">=</span> <span class="num">20</span><span class="punc">;</span>
+umur <span class="op">=</span> <span class="num">21</span><span class="punc">;</span>           <span class="cmt">// ok</span>
+
+<span class="cmt">// const — tidak bisa diubah (gunakan untuk nilai tetap)</span>
+<span class="kw">const</span> nama <span class="op">=</span> <span class="str">"Budi"</span><span class="punc">;</span>
+<span class="cmt">// nama = "Ani";   → Error!</span>
+
+<span class="cmt">// Tipe data otomatis (dynamic typing)</span>
+<span class="kw">let</span> teks    <span class="op">=</span> <span class="str">"Halo"</span><span class="punc">;</span>       <span class="cmt">// String</span>
+<span class="kw">let</span> angka   <span class="op">=</span> <span class="num">42</span><span class="punc">;</span>          <span class="cmt">// Number</span>
+<span class="kw">let</span> desimal <span class="op">=</span> <span class="num">3.14</span><span class="punc">;</span>        <span class="cmt">// Number (sama)</span>
+<span class="kw">let</span> benar   <span class="op">=</span> <span class="bool">true</span><span class="punc">;</span>        <span class="cmt">// Boolean</span>
+<span class="kw">let</span> kosong  <span class="op">=</span> <span class="bool">null</span><span class="punc">;</span>        <span class="cmt">// Null (sengaja kosong)</span>
+<span class="kw">let</span> belumAda<span class="punc">;</span>             <span class="cmt">// Undefined (belum diisi)</span>
+
+<span class="cmt">// Cek tipe dengan typeof</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="kw">typeof</span> teks<span class="punc">);</span>   <span class="cmt">// "string"</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="kw">typeof</span> angka<span class="punc">);</span>  <span class="cmt">// "number"</span>
+
+<span class="cmt">// Template literal — string dengan variabel di dalamnya</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">`Halo, </span><span class="op">${</span>nama<span class="op">}</span><span class="str">! Kamu </span><span class="op">${</span>umur<span class="op">}</span><span class="str"> tahun.`</span><span class="punc">);</span></pre>
+  </div>
+
+  <div class="output-label">Output</div>
+  <div class="output-box">string
+number
+Halo, Budi! Kamu 21 tahun.</div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">const</span><span class="ann-desc">Gunakan <code>const</code> sebagai default — kalau nilainya tidak perlu berubah. Pakai <code>let</code> hanya kalau memang akan diubah. Ini praktik modern yang dianjurkan.</span></div>
+    <div class="ann green"><span class="ann-code">`template ${literal}`</span><span class="ann-desc">Pakai backtick (`) bukan tanda kutip. Variabel atau ekspresi bisa dimasukkan langsung dengan <code>${...}</code>. Jauh lebih rapi dari penggabungan string dengan <code>+</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">typeof</span><span class="ann-desc">Operator untuk mengecek tipe data saat runtime. Berguna untuk debug atau validasi input. Hasilnya selalu string: <code>"string"</code>, <code>"number"</code>, <code>"boolean"</code>, <code>"undefined"</code>, <code>"object"</code>, <code>"function"</code>.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 3. OPERATOR ===== -->
+<div class="section" id="operator" style="animation-delay:0.15s">
+  <div class="section-header"><div class="section-num">3</div><h2>Operator</h2></div>
+  <p class="desc">Operator JS mirip dengan bahasa lain — aritmatika, perbandingan, logika. Yang perlu diperhatikan: JS punya dua jenis kesamaan, dan keduanya sangat berbeda perilakunya.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">operator.js</span></div>
+    <pre><span class="cmt">// Aritmatika</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="num">10</span> <span class="op">+</span> <span class="num">3</span><span class="punc">);</span>   <span class="cmt">// 13</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="num">10</span> <span class="op">%</span> <span class="num">3</span><span class="punc">);</span>   <span class="cmt">// 1  (modulus/sisa bagi)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="num">2</span> <span class="op">**</span> <span class="num">8</span><span class="punc">);</span>   <span class="cmt">// 256 (pangkat)</span>
+
+<span class="cmt">// == vs === (PENTING!)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="num">5</span> <span class="op">==</span>  <span class="str">"5"</span><span class="punc">);</span>  <span class="cmt">// true  (bandingkan nilai, abaikan tipe)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="num">5</span> <span class="op">===</span> <span class="str">"5"</span><span class="punc">);</span>  <span class="cmt">// false (bandingkan nilai DAN tipe) ✓</span>
+
+<span class="cmt">// Logika</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="bool">true</span> <span class="op">&&</span> <span class="bool">false</span><span class="punc">);</span>  <span class="cmt">// false (AND)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="bool">true</span> <span class="op">||</span> <span class="bool">false</span><span class="punc">);</span>  <span class="cmt">// true  (OR)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="op">!</span><span class="bool">true</span><span class="punc">);</span>           <span class="cmt">// false (NOT)</span>
+
+<span class="cmt">// Nullish coalescing — fallback kalau null/undefined</span>
+<span class="kw">let</span> input <span class="op">=</span> <span class="bool">null</span><span class="punc">;</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>input <span class="op">??</span> <span class="str">"default"</span><span class="punc">);</span>  <span class="cmt">// "default"</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">=== (strict equality)</span><span class="ann-desc">Selalu pakai <code>===</code> bukan <code>==</code>. Yang dua sama (<code>==</code>) melakukan type coercion — <code>"0" == false</code> hasilnya <code>true</code>, yang sering bikin bug aneh. <code>===</code> tidak melakukan konversi tipe.</span></div>
+    <div class="ann green"><span class="ann-code">?? (nullish coalescing)</span><span class="ann-desc">Mengembalikan nilai kanan kalau nilai kiri adalah <code>null</code> atau <code>undefined</code>. Berbeda dengan <code>||</code> yang juga trigger untuk <code>0</code>, <code>""</code>, <code>false</code>. Berguna untuk nilai default.</span></div>
+    <div class="ann yellow"><span class="ann-code">** (pangkat)</span><span class="ann-desc">Operator eksponensial ES2016. <code>2 ** 10</code> = 1024. Alternatif: <code>Math.pow(2, 10)</code>.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 4. KONDISI ===== -->
+<div class="section" id="kondisi" style="animation-delay:0.2s">
+  <div class="section-header"><div class="section-num">4</div><h2>if / else &amp; switch</h2></div>
+  <p class="desc">Struktur kondisi JS sama seperti C — <code>if/else if/else</code> dan <code>switch</code>. Plus ada ternary operator untuk kondisi singkat satu baris.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">kondisi.js</span></div>
+      <pre><span class="kw">let</span> nilai <span class="op">=</span> <span class="num">78</span><span class="punc">;</span>
+
+<span class="cmt">// if / else if / else</span>
+<span class="kw">if</span> <span class="punc">(</span>nilai <span class="op">>=</span> <span class="num">85</span><span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"A"</span><span class="punc">);</span>
+<span class="punc">}</span> <span class="kw">else if</span> <span class="punc">(</span>nilai <span class="op">>=</span> <span class="num">70</span><span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"B"</span><span class="punc">);</span>   <span class="cmt">// ini yang jalan</span>
+<span class="punc">}</span> <span class="kw">else</span> <span class="punc">{</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"C"</span><span class="punc">);</span>
+<span class="punc">}</span>
+
+<span class="cmt">// Ternary — kondisi ? jalanKalauBenar : jalanKalauSalah</span>
+<span class="kw">let</span> status <span class="op">=</span> nilai <span class="op">>=</span> <span class="num">60</span> <span class="op">?</span> <span class="str">"Lulus"</span> <span class="op">:</span> <span class="str">"Tidak Lulus"</span><span class="punc">;</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>status<span class="punc">);</span>  <span class="cmt">// "Lulus"</span>
+
+<span class="cmt">// switch</span>
+<span class="kw">let</span> hari <span class="op">=</span> <span class="str">"Senin"</span><span class="punc">;</span>
+<span class="kw">switch</span> <span class="punc">(</span>hari<span class="punc">) {</span>
+  <span class="kw">case</span> <span class="str">"Sabtu"</span><span class="punc">:</span>
+  <span class="kw">case</span> <span class="str">"Minggu"</span><span class="punc">:</span>
+    <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Libur!"</span><span class="punc">);</span>
+    <span class="kw">break</span><span class="punc">;</span>
+  <span class="kw">default</span><span class="punc">:</span>
+    <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Hari kerja"</span><span class="punc">);</span>
+<span class="punc">}</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <label style="font-size:13px;font-weight:600;">Nilai:</label>
+          <input id="nilaiInput" type="number" value="78" min="0" max="100" style="width:70px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
+          <button onclick="
+            var n=parseInt(document.getElementById('nilaiInput').value);
+            var g=n>=85?'A':n>=70?'B':n>=60?'C':n>=40?'D':'E';
+            var s=n>=60?'Lulus':'Tidak Lulus';
+            document.getElementById('nilaiOut').innerHTML='Grade: <b>'+g+'</b> — '+s;
+          " style="background:#fbbf24;color:#0f1117;border:none;padding:5px 12px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">Cek</button>
+        </div>
+        <div id="nilaiOut" style="background:#f1f5f9;border-radius:6px;padding:8px 12px;font-size:13px;color:#334155;min-height:36px;">Klik Cek untuk lihat hasil</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">kondisi ? a : b</span><span class="ann-desc">Ternary operator: versi singkat if/else untuk satu ekspresi. Bagus untuk assignment singkat, tapi jangan nested ternary — bikin kode susah dibaca.</span></div>
+    <div class="ann green"><span class="ann-code">case "Sabtu": case "Minggu":</span><span class="ann-desc">Dua case berturut-turut tanpa break di antara = keduanya menjalankan blok yang sama (fall-through). Trik untuk handle beberapa kondisi dengan aksi sama.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 5. LOOP ===== -->
+<div class="section" id="loop" style="animation-delay:0.25s">
+  <div class="section-header"><div class="section-num">5</div><h2>Loop — "Ulang Terus"</h2></div>
+  <p class="desc">JavaScript punya beberapa jenis loop. <code>for</code> dan <code>while</code> mirip C, tapi ada tambahan <code>for...of</code> yang lebih modern dan mudah untuk iterasi array.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">loop.js</span></div>
+    <pre><span class="cmt">// for — seperti C</span>
+<span class="kw">for</span> <span class="punc">(</span><span class="kw">let</span> i <span class="op">=</span> <span class="num">0</span><span class="punc">;</span> i <span class="op"><</span> <span class="num">3</span><span class="punc">;</span> i<span class="op">++</span><span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">`Iterasi ke-</span><span class="op">${</span>i<span class="op">}</span><span class="str">`</span><span class="punc">);</span>
+<span class="punc">}</span>
+
+<span class="cmt">// while</span>
+<span class="kw">let</span> n <span class="op">=</span> <span class="num">1</span><span class="punc">;</span>
+<span class="kw">while</span> <span class="punc">(</span>n <span class="op"><=</span> <span class="num">5</span><span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>n<span class="punc">);</span>
+  n<span class="op">++</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">// for...of — iterasi array (lebih modern)</span>
+<span class="kw">const</span> buah <span class="op">=</span> <span class="punc">[</span><span class="str">"apel"</span><span class="punc">,</span> <span class="str">"mangga"</span><span class="punc">,</span> <span class="str">"jeruk"</span><span class="punc">];</span>
+<span class="kw">for</span> <span class="punc">(</span><span class="kw">const</span> item <span class="kw">of</span> buah<span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>item<span class="punc">);</span>
+<span class="punc">}</span>
+
+<span class="cmt">// for...in — iterasi key object</span>
+<span class="kw">const</span> orang <span class="op">=</span> <span class="punc">{</span> nama<span class="punc">:</span> <span class="str">"Budi"</span><span class="punc">,</span> umur<span class="punc">:</span> <span class="num">20</span> <span class="punc">};</span>
+<span class="kw">for</span> <span class="punc">(</span><span class="kw">const</span> key <span class="kw">in</span> orang<span class="punc">) {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">`</span><span class="op">${</span>key<span class="op">}</span><span class="str">: </span><span class="op">${</span>orang<span class="punc">[</span>key<span class="punc">]</span><span class="op">}</span><span class="str">`</span><span class="punc">);</span>
+<span class="punc">}</span></pre>
+  </div>
+
+  <div class="output-label">Output</div>
+  <div class="output-box">Iterasi ke-0
+Iterasi ke-1
+Iterasi ke-2
+apel
+mangga
+jeruk
+nama: Budi
+umur: 20</div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">for...of</span><span class="ann-desc">Iterasi nilai dari array (atau iterable lain). Lebih bersih dari <code>for</code> biasa karena tidak perlu index. Gunakan ini untuk array, tinggalkan <code>for</code> biasa untuk kasus yang butuh index.</span></div>
+    <div class="ann green"><span class="ann-code">for...in</span><span class="ann-desc">Iterasi <em>key</em> (nama properti) dari object. Untuk ambil nilainya: <code>orang[key]</code>. Jangan pakai <code>for...in</code> di array — hasilnya bisa tidak terduga.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 6. FUNGSI ===== -->
+<div class="section" id="fungsi" style="animation-delay:0.3s">
+  <div class="section-header"><div class="section-num">6</div><h2>Fungsi — "Kode yang Bisa Dipanggil Ulang"</h2></div>
+  <p class="desc">JavaScript punya tiga cara menulis fungsi. Yang modern dan sering dipakai: <strong>arrow function</strong> — lebih singkat dan punya perilaku <code>this</code> yang lebih predictable.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">fungsi.js</span></div>
+    <pre><span class="cmt">// 1. Function declaration (bisa dipanggil sebelum dideklarasi)</span>
+<span class="kw">function</span> <span class="fn">sapa</span><span class="punc">(</span>nama<span class="punc">) {</span>
+  <span class="kw">return</span> <span class="str">`Halo, </span><span class="op">${</span>nama<span class="op">}</span><span class="str">!`</span><span class="punc">;</span>
+<span class="punc">}</span>
+
+<span class="cmt">// 2. Arrow function (modern, ringkas)</span>
+<span class="kw">const</span> <span class="fn">tambah</span> <span class="op">=</span> <span class="punc">(</span>a<span class="punc">,</span> b<span class="punc">) =></span> a <span class="op">+</span> b<span class="punc">;</span>
+
+<span class="cmt">// Arrow function dengan badan fungsi</span>
+<span class="kw">const</span> <span class="fn">gradeNilai</span> <span class="op">=</span> <span class="punc">(</span>nilai<span class="punc">) => {</span>
+  <span class="kw">if</span> <span class="punc">(</span>nilai <span class="op">>=</span> <span class="num">85</span><span class="punc">)</span> <span class="kw">return</span> <span class="str">"A"</span><span class="punc">;</span>
+  <span class="kw">if</span> <span class="punc">(</span>nilai <span class="op">>=</span> <span class="num">70</span><span class="punc">)</span> <span class="kw">return</span> <span class="str">"B"</span><span class="punc">;</span>
+  <span class="kw">return</span> <span class="str">"C"</span><span class="punc">;</span>
+<span class="punc">};</span>
+
+<span class="cmt">// Default parameter</span>
+<span class="kw">const</span> <span class="fn">beriSalam</span> <span class="op">=</span> <span class="punc">(</span>nama <span class="op">=</span> <span class="str">"teman"</span><span class="punc">) =></span> <span class="str">`Hai, </span><span class="op">${</span>nama<span class="op">}</span><span class="str">!`</span><span class="punc">;</span>
+
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="fn">sapa</span><span class="punc">(</span><span class="str">"Ani"</span><span class="punc">));</span>        <span class="cmt">// "Halo, Ani!"</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="fn">tambah</span><span class="punc">(</span><span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">));</span>       <span class="cmt">// 7</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="fn">gradeNilai</span><span class="punc">(</span><span class="num">78</span><span class="punc">));</span>     <span class="cmt">// "B"</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="fn">beriSalam</span><span class="punc">());</span>        <span class="cmt">// "Hai, teman!"</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">(a, b) => a + b</span><span class="ann-desc">Arrow function satu baris: kalau hanya satu ekspresi, tidak perlu kurung kurawal dan <code>return</code> — hasilnya otomatis di-return. Kalau butuh banyak baris, pakai kurung kurawal dan tulis <code>return</code> manual.</span></div>
+    <div class="ann green"><span class="ann-code">parameter = "default"</span><span class="ann-desc">Default parameter: kalau argument tidak dikirim saat fungsi dipanggil, pakai nilai default. Lebih bersih dari cek manual <code>if (nama === undefined) nama = "teman"</code>.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 7. ARRAY ===== -->
+<div class="section" id="array" style="animation-delay:0.35s">
+  <div class="section-header"><div class="section-num">7</div><h2>Array — "Daftar Data"</h2></div>
+  <p class="desc">Array JS lebih fleksibel dari array C — bisa campuran tipe, bisa tumbuh/menyusut dinamis, dan punya banyak method built-in yang powerful.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">array.js</span></div>
+    <pre><span class="kw">const</span> nilai <span class="op">=</span> <span class="punc">[</span><span class="num">85</span><span class="punc">,</span> <span class="num">70</span><span class="punc">,</span> <span class="num">92</span><span class="punc">,</span> <span class="num">78</span><span class="punc">];</span>
+
+<span class="cmt">// Akses dan panjang</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>nilai<span class="punc">[</span><span class="num">0</span><span class="punc">]);</span>           <span class="cmt">// 85</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>nilai<span class="punc">.</span><span class="met">length</span><span class="punc">);</span>       <span class="cmt">// 4</span>
+
+<span class="cmt">// Tambah / hapus</span>
+nilai<span class="punc">.</span><span class="met">push</span><span class="punc">(</span><span class="num">65</span><span class="punc">);</span>                  <span class="cmt">// tambah di akhir</span>
+nilai<span class="punc">.</span><span class="met">pop</span><span class="punc">();</span>                    <span class="cmt">// hapus dari akhir</span>
+
+<span class="cmt">// map — ubah setiap elemen, hasilnya array baru</span>
+<span class="kw">const</span> doubled <span class="op">=</span> nilai<span class="punc">.</span><span class="met">map</span><span class="punc">(</span>n <span class="op">=></span> n <span class="op">*</span> <span class="num">2</span><span class="punc">);</span>
+
+<span class="cmt">// filter — ambil elemen yang memenuhi syarat</span>
+<span class="kw">const</span> lulus <span class="op">=</span> nilai<span class="punc">.</span><span class="met">filter</span><span class="punc">(</span>n <span class="op">=></span> n <span class="op">>=</span> <span class="num">75</span><span class="punc">);</span>
+
+<span class="cmt">// find — cari elemen pertama yang cocok</span>
+<span class="kw">const</span> pertama <span class="op">=</span> nilai<span class="punc">.</span><span class="met">find</span><span class="punc">(</span>n <span class="op">=></span> n <span class="op">>=</span> <span class="num">90</span><span class="punc">);</span>
+
+<span class="cmt">// reduce — akumulasi jadi satu nilai</span>
+<span class="kw">const</span> total <span class="op">=</span> nilai<span class="punc">.</span><span class="met">reduce</span><span class="punc">((</span>acc<span class="punc">,</span> n<span class="punc">) =></span> acc <span class="op">+</span> n<span class="punc">,</span> <span class="num">0</span><span class="punc">);</span>
+
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>lulus<span class="punc">);</span>    <span class="cmt">// [85, 92, 78]</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>pertama<span class="punc">);</span>  <span class="cmt">// 92</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>total<span class="punc">);</span>    <span class="cmt">// 325</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">.map()</span><span class="ann-desc">Mengubah setiap elemen dengan fungsi yang diberikan, menghasilkan array baru dengan ukuran sama. Array asli tidak berubah. Contoh klasik: konversi data, format tampilan.</span></div>
+    <div class="ann green"><span class="ann-code">.filter()</span><span class="ann-desc">Mengambil elemen yang fungsinya mengembalikan <code>true</code>. Hasilnya array baru yang lebih pendek atau sama panjang. Array asli tidak berubah.</span></div>
+    <div class="ann yellow"><span class="ann-code">.reduce(callback, initialValue)</span><span class="ann-desc"><code>acc</code> adalah akumulator — nilai yang terus dikumpulkan. <code>0</code> adalah nilai awalnya. Berguna untuk jumlah, rata-rata, atau transformasi array ke satu nilai.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 8. OBJECT ===== -->
+<div class="section" id="objek" style="animation-delay:0.4s">
+  <div class="section-header"><div class="section-num">8</div><h2>Object — "Data dengan Nama Properti"</h2></div>
+  <p class="desc">Object adalah kumpulan pasangan key-value. Mirip struct di C, tapi lebih fleksibel — propertinya bisa ditambah, dihapus, bahkan berisi fungsi.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">object.js</span></div>
+    <pre><span class="cmt">// Buat object</span>
+<span class="kw">const</span> mahasiswa <span class="op">=</span> <span class="punc">{</span>
+  nama<span class="punc">:</span>    <span class="str">"Budi"</span><span class="punc">,</span>
+  nim<span class="punc">:</span>     <span class="str">"12345"</span><span class="punc">,</span>
+  ipk<span class="punc">:</span>     <span class="num">3.75</span><span class="punc">,</span>
+  <span class="fn">sapa</span><span class="punc">() {</span>                   <span class="cmt">// method (fungsi dalam object)</span>
+    <span class="kw">return</span> <span class="str">`Saya </span><span class="op">${</span><span class="kw">this</span><span class="punc">.</span>nama<span class="op">}</span><span class="str">`</span><span class="punc">;</span>
+  <span class="punc">}</span>
+<span class="punc">};</span>
+
+<span class="cmt">// Akses properti</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>mahasiswa<span class="punc">.</span>nama<span class="punc">);</span>      <span class="cmt">// "Budi"</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>mahasiswa<span class="punc">[</span><span class="str">"ipk"</span><span class="punc">]);</span>   <span class="cmt">// 3.75 (bracket notation)</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>mahasiswa<span class="punc">.</span><span class="fn">sapa</span><span class="punc">());</span>    <span class="cmt">// "Saya Budi"</span>
+
+<span class="cmt">// Destructuring — ambil properti ke variabel langsung</span>
+<span class="kw">const</span> <span class="punc">{</span> nama<span class="punc">,</span> ipk <span class="punc">}</span> <span class="op">=</span> mahasiswa<span class="punc">;</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>nama<span class="punc">,</span> ipk<span class="punc">);</span>          <span class="cmt">// "Budi" 3.75</span>
+
+<span class="cmt">// Spread — copy / gabung object</span>
+<span class="kw">const</span> updated <span class="op">=</span> <span class="punc">{</span> <span class="op">...</span>mahasiswa<span class="punc">,</span> ipk<span class="punc">:</span> <span class="num">3.9</span> <span class="punc">};</span></pre>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">this</span><span class="ann-desc">Di dalam method object, <code>this</code> merujuk ke object itu sendiri. <code>this.nama</code> = akses properti <code>nama</code> dari object yang memiliki method ini. Jangan pakai arrow function untuk method karena <code>this</code>-nya berbeda.</span></div>
+    <div class="ann green"><span class="ann-code">const { nama, ipk } = obj</span><span class="ann-desc">Destructuring: ekstrak beberapa properti sekaligus ke variabel terpisah. Jauh lebih ringkas dari <code>const nama = obj.nama; const ipk = obj.ipk;</code>.</span></div>
+    <div class="ann yellow"><span class="ann-code">{ ...obj, key: newVal }</span><span class="ann-desc">Spread operator: salin semua properti object lama, lalu override properti tertentu. Hasilnya object baru — object asli tidak berubah. Pola ini sangat umum di React.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 9. DOM ===== -->
+<div class="section" id="dom" style="animation-delay:0.45s">
+  <div class="section-header"><div class="section-num">9</div><h2>DOM — "Manipulasi HTML dengan JavaScript"</h2></div>
+  <p class="desc">DOM (Document Object Model) adalah representasi HTML sebagai objek yang bisa dimanipulasi JS. Lewat DOM, lo bisa ubah teks, warna, tambah/hapus elemen — semua secara dinamis tanpa refresh halaman.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">dom.js</span></div>
+      <pre><span class="cmt">// Pilih elemen</span>
+<span class="kw">const</span> judul <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">getElementById</span><span class="punc">(</span><span class="str">"judul"</span><span class="punc">);</span>
+<span class="kw">const</span> semua <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">querySelectorAll</span><span class="punc">(</span><span class="str">".item"</span><span class="punc">);</span>
+<span class="kw">const</span> satu  <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">querySelector</span><span class="punc">(</span><span class="str">".item"</span><span class="punc">);</span>
+
+<span class="cmt">// Ubah konten dan style</span>
+judul<span class="punc">.</span>textContent <span class="op">=</span> <span class="str">"Judul Baru"</span><span class="punc">;</span>
+judul<span class="punc">.</span>style<span class="punc">.</span>color <span class="op">=</span> <span class="str">"#fbbf24"</span><span class="punc">;</span>
+
+<span class="cmt">// Toggle class</span>
+judul<span class="punc">.</span>classList<span class="punc">.</span><span class="met">add</span><span class="punc">(</span><span class="str">"aktif"</span><span class="punc">);</span>
+judul<span class="punc">.</span>classList<span class="punc">.</span><span class="met">remove</span><span class="punc">(</span><span class="str">"aktif"</span><span class="punc">);</span>
+judul<span class="punc">.</span>classList<span class="punc">.</span><span class="met">toggle</span><span class="punc">(</span><span class="str">"aktif"</span><span class="punc">);</span>
+
+<span class="cmt">// Buat elemen baru</span>
+<span class="kw">const</span> item <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">createElement</span><span class="punc">(</span><span class="str">"li"</span><span class="punc">);</span>
+item<span class="punc">.</span>textContent <span class="op">=</span> <span class="str">"Item baru"</span><span class="punc">;</span>
+<span class="fn">document</span><span class="punc">.</span><span class="met">querySelector</span><span class="punc">(</span><span class="str">"ul"</span><span class="punc">).</span><span class="met">appendChild</span><span class="punc">(</span>item<span class="punc">);</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall" style="display:flex;flex-direction:column;gap:8px;">
+        <div id="demo-judul" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px;">Judul Asli</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="document.getElementById('demo-judul').textContent='Judul Diubah JS!'" style="background:#fbbf24;color:#0f1117;border:none;padding:5px 10px;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;">Ubah Teks</button>
+          <button onclick="var el=document.getElementById('demo-judul');el.style.color=el.style.color==='rgb(129, 140, 248)'?'#1e293b':'#818cf8'" style="background:#818cf8;color:#fff;border:none;padding:5px 10px;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;">Toggle Warna</button>
+          <button onclick="var li=document.createElement('li');li.textContent='Item #'+(document.getElementById('demo-list').children.length+1);document.getElementById('demo-list').appendChild(li)" style="background:#4ade80;color:#0f1117;border:none;padding:5px 10px;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;">Tambah Item</button>
+        </div>
+        <ul id="demo-list" style="font-size:13px;color:#475569;padding-left:18px;margin-top:4px;">
+          <li>Item awal</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">querySelector</span><span class="ann-desc">Pilih satu elemen dengan CSS selector. <code>querySelector(".kartu")</code> = elemen pertama ber-class <code>kartu</code>. <code>querySelectorAll</code> mengembalikan semua yang cocok sebagai NodeList.</span></div>
+    <div class="ann green"><span class="ann-code">classList.toggle()</span><span class="ann-desc">Tambah class kalau belum ada, hapus kalau sudah ada. Sangat berguna untuk tombol on/off, show/hide menu, dark mode toggle.</span></div>
+    <div class="ann yellow"><span class="ann-code">textContent vs innerHTML</span><span class="ann-desc"><code>textContent</code> lebih aman — hanya mengubah teks, tag HTML tidak diproses. <code>innerHTML</code> memproses HTML di dalamnya, tapi berbahaya kalau isinya dari input user (bisa XSS injection).</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 10. EVENT ===== -->
+<div class="section" id="event" style="animation-delay:0.5s">
+  <div class="section-header"><div class="section-num">10</div><h2>Event — "Reaksi terhadap Aksi User"</h2></div>
+  <p class="desc">Event adalah aksi yang dilakukan user — klik, ketik, hover, scroll. JavaScript "mendengarkan" event ini dengan <code>addEventListener</code> lalu menjalankan fungsi saat event terjadi.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">event.js</span></div>
+      <pre><span class="kw">const</span> tombol <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">querySelector</span><span class="punc">(</span><span class="str">"#tombol"</span><span class="punc">);</span>
+<span class="kw">const</span> input  <span class="op">=</span> <span class="fn">document</span><span class="punc">.</span><span class="met">querySelector</span><span class="punc">(</span><span class="str">"#inputnya"</span><span class="punc">);</span>
+
+<span class="cmt">// Klik</span>
+tombol<span class="punc">.</span><span class="met">addEventListener</span><span class="punc">(</span><span class="str">"click"</span><span class="punc">,</span> <span class="punc">() => {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Tombol diklik!"</span><span class="punc">);</span>
+<span class="punc">});</span>
+
+<span class="cmt">// Ketik di input — event.target.value = nilai input</span>
+input<span class="punc">.</span><span class="met">addEventListener</span><span class="punc">(</span><span class="str">"input"</span><span class="punc">,</span> <span class="punc">(</span>event<span class="punc">) => {</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>event<span class="punc">.</span>target<span class="punc">.</span>value<span class="punc">);</span>
+<span class="punc">});</span>
+
+<span class="cmt">// Submit form — cegah reload halaman</span>
+<span class="fn">document</span><span class="punc">.</span><span class="met">querySelector</span><span class="punc">(</span><span class="str">"form"</span><span class="punc">).</span><span class="met">addEventListener</span><span class="punc">(</span><span class="str">"submit"</span><span class="punc">,</span> <span class="punc">(</span>e<span class="punc">) => {</span>
+  e<span class="punc">.</span><span class="met">preventDefault</span><span class="punc">();</span>  <span class="cmt">// PENTING: cegah reload</span>
+  <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span><span class="str">"Form dikirim!"</span><span class="punc">);</span>
+<span class="punc">});</span>
+
+<span class="cmt">// Event lain yang umum</span>
+<span class="cmt">// "mouseover"  — hover masuk</span>
+<span class="cmt">// "mouseout"   — hover keluar</span>
+<span class="cmt">// "keydown"    — tombol keyboard ditekan</span>
+<span class="cmt">// "change"     — nilai berubah (select, checkbox)</span>
+<span class="cmt">// "DOMContentLoaded" — HTML selesai dimuat</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall" style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Ketik sesuatu:</label>
+          <input id="ev-input" type="text" placeholder="Ketik di sini..." style="width:100%;padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;" oninput="document.getElementById('ev-out').textContent='Nilai: '+this.value">
+        </div>
+        <div id="ev-out" style="background:#f1f5f9;border-radius:6px;padding:8px 12px;font-size:13px;color:#475569;min-height:34px;">Nilai: (belum ada input)</div>
+        <button onclick="var n=parseInt(document.getElementById('ev-counter').textContent||0)+1;document.getElementById('ev-counter').textContent=n;document.getElementById('ev-countout').textContent='Diklik '+n+' kali'" style="background:#fbbf24;color:#0f1117;border:none;padding:7px 14px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">Klik saya</button>
+        <div><span id="ev-counter" style="display:none">0</span><div id="ev-countout" style="font-size:13px;color:#475569;">Diklik 0 kali</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">addEventListener(event, callback)</span><span class="ann-desc">Lebih baik dari attribute HTML (<code>onclick="..."</code>) karena bisa pasang beberapa listener di satu elemen, dan kode JS terpisah dari HTML.</span></div>
+    <div class="ann green"><span class="ann-code">event.target.value</span><span class="ann-desc"><code>event.target</code> adalah elemen yang memicu event. <code>.value</code> untuk ambil nilai input/select/textarea. <code>.checked</code> untuk checkbox.</span></div>
+    <div class="ann yellow"><span class="ann-code">e.preventDefault()</span><span class="ann-desc">Cegah perilaku default browser. Untuk form: cegah reload halaman. Untuk link: cegah navigasi. Untuk drag: cegah drop default. Sangat sering dipakai di form handling.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 11. FETCH API ===== -->
+<div class="section" id="fetch" style="animation-delay:0.55s">
+  <div class="section-header"><div class="section-num">11</div><h2>Fetch API — "Ambil Data dari Internet"</h2></div>
+  <p class="desc">Fetch API dipakai untuk mengambil data dari server atau API tanpa reload halaman. Hasilnya <em>asinkron</em> — JS tidak berhenti menunggu, tapi lanjut dan proses hasilnya kalau sudah siap.</p>
+
+  <div class="demo-wrap">
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">fetch.js</span></div>
+      <pre><span class="cmt">// async/await — cara modern baca fetch</span>
+<span class="kw">async function</span> <span class="fn">ambilData</span><span class="punc">() {</span>
+  <span class="kw">try</span> <span class="punc">{</span>
+    <span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="punc">(</span>
+      <span class="str">"https://jsonplaceholder.typicode.com/users/1"</span>
+    <span class="punc">);</span>
+
+    <span class="kw">const</span> data <span class="op">=</span> <span class="kw">await</span> response<span class="punc">.</span><span class="met">json</span><span class="punc">();</span>
+
+    <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>data<span class="punc">.</span>name<span class="punc">);</span>  <span class="cmt">// "Leanne Graham"</span>
+    <span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>data<span class="punc">.</span>email<span class="punc">);</span> <span class="cmt">// "Sincere@april.biz"</span>
+
+  <span class="punc">}</span> <span class="kw">catch</span> <span class="punc">(</span>error<span class="punc">) {</span>
+    <span class="fn">console</span><span class="punc">.</span><span class="met">error</span><span class="punc">(</span><span class="str">"Gagal:"</span><span class="punc">,</span> error<span class="punc">);</span>
+  <span class="punc">}</span>
+<span class="punc">}</span>
+
+<span class="fn">ambilData</span><span class="punc">();</span></pre>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-header">Live Preview</div>
+      <div class="preview-live tall" style="display:flex;flex-direction:column;gap:8px;">
+        <button id="fetch-btn" onclick="
+          var out=document.getElementById('fetch-out');
+          out.textContent='Mengambil data...';
+          fetch('https://jsonplaceholder.typicode.com/users/1')
+            .then(r=>r.json())
+            .then(d=>{out.innerHTML='<b>Nama:</b> '+d.name+'<br><b>Email:</b> '+d.email+'<br><b>Kota:</b> '+d.address.city})
+            .catch(()=>{out.textContent='Gagal — coba lagi'})
+        " style="background:#fbbf24;color:#0f1117;border:none;padding:8px 16px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;">▶ Fetch data user</button>
+        <div id="fetch-out" style="background:#f1f5f9;border-radius:6px;padding:10px 12px;font-size:13px;color:#334155;min-height:60px;line-height:1.8;">Klik tombol untuk ambil data dari API nyata</div>
+        <div style="font-size:11px;color:#94a3b8;">Data dari jsonplaceholder.typicode.com (API gratis untuk belajar)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann"><span class="ann-code">async / await</span><span class="ann-desc"><code>async</code> di depan fungsi artinya fungsi ini asinkron. <code>await</code> dipakai di dalam fungsi async untuk "tunggu" sampai Promise selesai sebelum lanjut. Kode jadi terlihat synchronous padahal async.</span></div>
+    <div class="ann green"><span class="ann-code">response.json()</span><span class="ann-desc">Parse body response sebagai JSON. Perlu di-<code>await</code> juga karena prosesnya asinkron. Hasilnya adalah objek JS yang bisa diakses langsung.</span></div>
+    <div class="ann yellow"><span class="ann-code">try / catch</span><span class="ann-desc">Tangkap error yang mungkin terjadi — network error, server down, JSON rusak. Tanpa ini, error tidak tertangani dan program bisa crash tanpa pesan yang jelas.</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ===== 12. TIPS ===== -->
+<div class="section" id="tips" style="animation-delay:0.6s">
+  <div class="section-header"><div class="section-num">12</div><h2>Tips &amp; Trik JavaScript</h2></div>
+  <p class="desc">Shortcut dan kebiasaan coding JS yang bikin kode lebih bersih dan efisien.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="code-label">tips.js</span></div>
+    <pre><span class="cmt">// Optional chaining — aman akses properti nested</span>
+<span class="kw">const</span> kota <span class="op">=</span> user<span class="op">?.</span>address<span class="op">?.</span>city<span class="punc">;</span>
+<span class="cmt">// Tanpa ?. bisa error kalau user atau address undefined</span>
+
+<span class="cmt">// Array destructuring</span>
+<span class="kw">const</span> <span class="punc">[</span>pertama<span class="punc">,</span> kedua<span class="punc">]</span> <span class="op">=</span> <span class="punc">[</span><span class="num">10</span><span class="punc">,</span> <span class="num">20</span><span class="punc">,</span> <span class="num">30</span><span class="punc">];</span>
+<span class="fn">console</span><span class="punc">.</span><span class="met">log</span><span class="punc">(</span>pertama<span class="punc">);</span>  <span class="cmt">// 10</span>
+
+<span class="cmt">// Konversi tipe</span>
+<span class="fn">Number</span><span class="punc">(</span><span class="str">"42"</span><span class="punc">);</span>           <span class="cmt">// 42</span>
+<span class="fn">String</span><span class="punc">(</span><span class="num">42</span><span class="punc">);</span>            <span class="cmt">// "42"</span>
+<span class="fn">parseInt</span><span class="punc">(</span><span class="str">"42px"</span><span class="punc">);</span>      <span class="cmt">// 42 (ambil angka di awal)</span>
+<span class="fn">parseFloat</span><span class="punc">(</span><span class="str">"3.14"</span><span class="punc">);</span>   <span class="cmt">// 3.14</span>
+
+<span class="cmt">// String methods yang sering dipakai</span>
+<span class="str">"halo dunia"</span><span class="punc">.</span><span class="met">toUpperCase</span><span class="punc">();</span>        <span class="cmt">// "HALO DUNIA"</span>
+<span class="str">"  spasi  "</span><span class="punc">.</span><span class="met">trim</span><span class="punc">();</span>               <span class="cmt">// "spasi"</span>
+<span class="str">"a,b,c"</span><span class="punc">.</span><span class="met">split</span><span class="punc">(</span><span class="str">","</span><span class="punc">);</span>                <span class="cmt">// ["a","b","c"]</span>
+<span class="str">"halo"</span><span class="punc">.</span><span class="met">includes</span><span class="punc">(</span><span class="str">"hal"</span><span class="punc">);</span>           <span class="cmt">// true</span>
+<span class="str">"halo dunia"</span><span class="punc">.</span><span class="met">replace</span><span class="punc">(</span><span class="str">"dunia"</span><span class="punc">,</span><span class="str">"JS"</span><span class="punc">);</span>  <span class="cmt">// "halo JS"</span></pre>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Shortcut</th><th>Fungsi</th></tr></thead>
+    <tbody>
+      <tr><td>user?.name</td><td>Optional chaining — tidak error kalau user undefined</td></tr>
+      <tr><td>value ?? "default"</td><td>Fallback kalau null/undefined</td></tr>
+      <tr><td>[...arr1, ...arr2]</td><td>Gabung dua array jadi satu</td></tr>
+      <tr><td>{...obj1, ...obj2}</td><td>Gabung dua object</td></tr>
+      <tr><td>Math.max(...arr)</td><td>Nilai terbesar dalam array</td></tr>
+      <tr><td>arr.sort((a,b)=>a-b)</td><td>Urutkan array angka ascending</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout warn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>Jangan pakai <code>var</code> — pakai <code>const</code> dan <code>let</code>. Jangan pakai <code>==</code> — selalu pakai <code>===</code>. Dua kebiasaan ini saja udah menghilangkan banyak bug umum di JavaScript.</span>
+  </div>
+</div>
+
+</div><!-- end .content -->
+
+<footer>
+  Panduan JavaScript untuk Pemula &middot; HTML → CSS → JavaScript — Sekarang lo udah punya dasar web development!
+</footer>
+
+<script>
+  function bukaDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function tutupDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupDrawer(); });
+</script>
+
+</body>
+</html>
